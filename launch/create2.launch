@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- COMMANDER PARAMETERS -->
+    <arg name="commander_dt" default="0.05"/>
+
+    <!-- OBSTACLE FEEDER PARAMETERS -->
+    <arg name="obstacles_directory"/>
+    <arg name="occupancy_grid_step_size" default="[0.5, 0.5, 0.5]"/>
+
+
+    <!-- PLANNER PARAMETERS -->
+    <arg name="robot_idx"/>
+    <arg name="continuity_upto_degree" default="2"/> <!-- used in commander as well -->
+    <arg name="replanning_period" default="0.1"/>
+    <arg name="maximum_derivative_magnitude_degrees" default="[1, 2]"/>
+    <arg name="maximum_derivative_magnitude_magnitudes" default="[4.0, 2.0]"/>
+    <arg name="workspace_min" default="[-10, -10, 0]"/>
+    <arg name="workspace_max" default="[10, 10, 0.5]"/>
+    <arg name="collision_shape_at_zero_min" default="[-0.2, -0.2, -0.05]"/>
+    <arg name="collision_shape_at_zero_max" default="[0.2, 0.2, 0.05"/>
+    <arg name="soft_optimization_parameters/robot_to_robot_hyperplane_constraints_enabled" default="true"/>
+    <arg name="soft_optimization_parameters/robot_to_obstacle_hyperplane_constraints_enabled" default="true"/>
+    <arg name="soft_optimization_parameters/initial_point_constraints_enabled" default="true"/>
+    <arg name="soft_optimization_parameters/continuity_constraints_enabled" default="true"/>
+    <arg name="soft_optimization_parameters/robot_to_robot_hyperplane_constraints_value" default="10000"/>
+    <arg name="soft_optimization_parameters/robot_to_obstacle_hyperplane_constraints_value" default="1000000"/>
+    <arg name="soft_optimization_parameters/initial_point_constraints_value" default="100000"/>
+    <arg name="soft_optimization_parameters/continuity_constraints_value" default="1000"/>
+    <arg name="optimization_obstacle_check_distance" default="0.5"/>
+    <arg name="optimizer" default="rlss-hard-soft"/>
+    <arg name="piece_endpoint_cost_weights" default="[4, 8, 16, 32]"/>
+    <arg name="integrated_squared_derivative_weight_degrees" default="[1, 2, 4]"/>
+    <arg name="integrated_squared_derivative_weight_weights" default="[1.0, 0.8, 0.1]"/>
+    <arg name="desired_time_horizon" default="5.0"/>
+    <arg name="max_rescaling_count" default="6"/>
+    <arg name="rescaling_multiplier" default="1.2"/>
+    <arg name="search_step" default="0.01"/>
+    <arg name="num_bezier_control_points" default="[8, 8, 8, 8]"/>
+
+    <!-- DRIVER PARAMETERS -->
+    <arg name="port" default="/dev/ttySAC0" />
+
+    <!-- CONTROLLER PARAMETERS -->
+    <arg name="robot_frame" default="base_link"/>
+    <arg name="parent_frame" default="odom"/>
+
+
+    <node pkg="rlss_ros" name="static_og_feeder" type="static_og_feeder">
+        <param name="obstacles_directory" value="$(arg obstacles_directory)"/>
+        <param name="occupancy_grid_step_size" value="$(arg occupancy_grid_step_size)"/>
+    </node>
+
+    <node pkg="rlss_ros" name="commander" type="create2_commander" required="true" output="screen">
+        <param name="commander_dt" value="$(arg commander_dt)" type="double"/>
+        <param name="continuity_upto_degree" value="$(arg continuity_upto_degree)"/>
+    </node>
+
+    <node pkg="rlss_ros" name="planner" type="planner_3d" required="true" output="screen">
+        <param name="robot_idx" value="$(arg robot_idx)"/>
+        <param name="continuity_upto_degree" value="$(arg continuity_upto_degree)"/>
+        <param name="replanning_period" value="$(arg replanning_period)"/>
+        <param name="maximum_derivative_magnitude_degrees" value="$(arg maximum_derivative_magnitude_degrees)"/>
+        <param name="maximum_derivative_magnitude_magnitudes" value="$(arg maximum_derivative_magnitude_magnitudes)"/>
+        <param name="workspace_min" value="$(arg workspace_min)"/>
+        <param name="workspace_max" value="$(arg workspace_max)"/>
+        <param name="collision_shape_at_zero_min" value="$(arg collision_shape_at_zero_min)"/>
+        <param name="collision_shape_at_zero_max" value="$(arg collision_shape_at_zero_max)"/>
+        <param name="soft_optimization_parameters/robot_to_robot_hyperplane_constraints_enabled" value="$(arg soft_optimization_parameters/robot_to_robot_hyperplane_constraints_enabled)"/>
+        <param name="soft_optimization_parameters/robot_to_obstacle_hyperplane_constraints_enabled" value="$(arg soft_optimization_parameters/robot_to_obstacle_hyperplane_constraints_enabled)"/>
+        <param name="soft_optimization_parameters/initial_point_constraints_enabled" value="$(arg soft_optimization_parameters/initial_point_constraints_enabled)"/>
+        <param name="soft_optimization_parameters/continuity_constraints_enabled" value="$(arg soft_optimization_parameters/continuity_constraints_enabled)"/>
+        <param name="soft_optimization_parameters/robot_to_robot_hyperplane_constraints_value" value="$(arg soft_optimization_parameters/robot_to_robot_hyperplane_constraints_value)"/>
+        <param name="soft_optimization_parameters/robot_to_obstacle_hyperplane_constraints_value" value="$(arg soft_optimization_parameters/robot_to_obstacle_hyperplane_constraints_value)"/>
+        <param name="soft_optimization_parameters/initial_point_constraints_value" value="$(arg soft_optimization_parameters/initial_point_constraints_value)"/>
+        <param name="soft_optimization_parameters/continuity_constraints_value" value="$(arg soft_optimization_parameters/continuity_constraints_value)"/>
+        <param name="optimization_obstacle_check_distance" value="$(arg optimization_obstacle_check_distance)"/>
+        <param name="optimizer" value="$(arg optimizer)"/>
+        <param name="piece_endpoint_cost_weights" value="$(arg piece_endpoint_cost_weights)"/>
+        <param name="integrated_squared_derivative_weight_degrees" value="$(arg integrated_squared_derivative_weight_degrees)"/>
+        <param name="integrated_squared_derivative_weight_weights" value="$(arg integrated_squared_derivative_weight_weights)"/>
+        <param name="desired_time_horizon" value="$(arg desired_time_horizon)"/>
+        <param name="max_rescaling_count" value="$(arg max_rescaling_count)"/>
+        <param name="rescaling_multiplier" value="$(arg rescaling_multiplier)"/>
+        <param name="search_step" value="$(arg search_step)"/>
+        <param name="num_bezier_control_points" value="$(arg num_bezier_control_points)"/>
+    </node>
+
+    <node name="driver" pkg="create2_driver" type="create2_driver_node" output="screen">
+        <param name="port" value="$(arg port)" />
+        <param name="brcPin" value="24" />
+        <param name="useBrcPin" value="true" />
+    </node>
+
+    <node name="controller" pkg="create2_controller" type="trajectory_controller" output="screen">
+        <param name="frame" value="$(arg robot_frame)" />
+        <param name="parentFrame" value="$(arg parent_frame)" />
+        <param name="Kx" value="5.0" />
+        <param name="Ky" value="10.0" />
+        <param name="Ktheta" value="40.0" />
+    </node>
+
+</launch>
