@@ -10,12 +10,12 @@
 
     <!-- PLANNER PARAMETERS -->
     <arg name="robot_idx" default="1"/>
-    <arg name="continuity_upto_degree" default="2"/> <!-- used in commander as well -->
+    <arg name="continuity_upto_degree" default="1"/> <!-- used in commander as well -->
     <arg name="replanning_period" default="0.1"/>
-    <arg name="maximum_derivative_magnitude_degrees" default="[1, 2]"/>
-    <arg name="maximum_derivative_magnitude_magnitudes" default="[0.4, 0.5]"/>
-    <arg name="workspace_min" default="[-10, -10, -0.1]"/>
-    <arg name="workspace_max" default="[10, 10, 0.6]"/>
+    <arg name="maximum_derivative_magnitude_degrees" default="[1]"/>
+    <arg name="maximum_derivative_magnitude_magnitudes" default="[0.8]"/>
+    <arg name="workspace_min" default="[-10, -10, -0.0001]"/>
+    <arg name="workspace_max" default="[10, 10, 0.50001]"/>
     <arg name="collision_shape_at_zero_min" default="[-0.2, -0.2, -0.05]"/>
     <arg name="collision_shape_at_zero_max" default="[0.2, 0.2, 0.05]"/>
     <arg name="soft_optimization_parameters/robot_to_robot_hyperplane_constraints_enabled" default="true"/>
@@ -29,9 +29,9 @@
     <arg name="optimization_obstacle_check_distance" default="0.5"/>
     <arg name="optimizer" default="rlss-hard"/>
     <arg name="piece_endpoint_cost_weights" default="[4, 8, 16, 32]"/>
-    <arg name="integrated_squared_derivative_weight_degrees" default="[1, 2, 4]"/>
-    <arg name="integrated_squared_derivative_weight_weights" default="[1.0, 0.8, 0.1]"/>
-    <arg name="desired_time_horizon" default="5.0"/>
+    <arg name="integrated_squared_derivative_weight_degrees" default="[1, 2]"/>
+    <arg name="integrated_squared_derivative_weight_weights" default="[1.0, 0.8]"/>
+    <arg name="desired_time_horizon" default="10.0"/>
     <arg name="max_rescaling_count" default="6"/>
     <arg name="rescaling_multiplier" default="1.2"/>
     <arg name="search_step" default="0.01"/>
@@ -88,11 +88,11 @@
     <node pkg="rlss_ros" name="reducer" type="create2_state_reducer" required="true" output="screen">
     </node>
 
-    <node name="controller" pkg="create2_controller" type="trajectory_controller" output="screen">
+    <node name="controller" pkg="create2_controller" type="trajectory_controller_v2" output="screen">
         <param name="frame" value="$(arg robot_frame)"/>
         <param name="parentFrame" value="$(arg parent_frame)"/>
-        <param name="Kx" value="5.0" />
-        <param name="Ky" value="10.0" />
+        <param name="Kx" value="12.0" />
+        <param name="Ky" value="12.0" />
         <param name="Ktheta" value="40.0"/>
     </node>
 

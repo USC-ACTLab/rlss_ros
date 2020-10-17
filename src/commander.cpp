@@ -38,7 +38,8 @@ void trajectoryCallback(const rlss_ros::PiecewiseTrajectory::ConstPtr& msg) {
     }
 
     traj = curve;
-    last_traj_update_time = ros::Time::now();
+    last_traj_update_time = msg->generation_time.data;
+//    last_traj_update_time = ros::Time::now();
 }
 
 

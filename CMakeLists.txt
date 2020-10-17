@@ -15,6 +15,7 @@ find_package(
         message_generation
         create2_controller
         nav_msgs
+        std_msgs
 )
 
 find_package(
@@ -83,8 +84,8 @@ add_message_files(
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
-    #DEPENDENCIES
-    #std_msgs  # Or other packages containing msgs
+    DEPENDENCIES
+    std_msgs  # Or other packages containing msgs
 )
 
 ################################################
@@ -148,6 +149,21 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/rlss-ros_node.cpp)
+
+add_executable(
+        figure8
+        src/figure8.cpp
+)
+target_link_libraries(
+        figure8
+        ${catkin_LIBRARIES}
+        rlss
+)
+add_dependencies(
+        figure8
+        ${PROJECT_NAME}_generate_messages_cpp
+)
+
 add_executable(
         planner_3d
         src/planner.cpp

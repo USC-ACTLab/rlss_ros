@@ -16,6 +16,7 @@
 #include <rlss/DiscretePathSearchers/RLSSDiscretePathSearcher.hpp>
 #include <rlss/ValidityCheckers/RLSSValidityChecker.hpp>
 #include <rlss/GoalSelectors/RLSSGoalSelector.hpp>
+#include <std_msgs/Time.h>
 
 constexpr unsigned int DIM = DIMENSION;
 
@@ -401,6 +402,7 @@ int main(int argc, char **argv) {
                 PiecewiseCurve traj = *curve;
 
                 rlss_ros::PiecewiseTrajectory traj_msg;
+                traj_msg.generation_time.data = current_time;
                 for(std::size_t i = 0; i < traj.numPieces(); i++) {
                     rlss_ros::Bezier bez_msg;
                     bez_msg.dimension = DIMENSION;

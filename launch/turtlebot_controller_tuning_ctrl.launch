@@ -1,0 +1,11 @@
+<launch>
+    <arg name="robot_frame" default="base_footprint"/>
+    <arg name="parent_frame" default="odom"/>
+    <node name="controller" pkg="create2_controller" type="trajectory_controller_v2" output="screen" required="true">
+        <param name="frame" value="$(arg robot_frame)"/>
+        <param name="parentFrame" value="$(arg parent_frame)"/>
+        <param name="Kx" value="12.0" />
+        <param name="Ky" value="12.0" />
+        <param name="Ktheta" value="40.0"/>
+    </node>
+</launch>
