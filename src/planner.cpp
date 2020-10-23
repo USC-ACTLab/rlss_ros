@@ -52,6 +52,9 @@ StdVectorVectorDIM state;
 unsigned int continuity_upto_degree;
 
 void otherRobotShapeCallback(const rlss_ros::AABBCollisionShape::ConstPtr& msg) {
+    if(msg->bbox.min.size() != DIM) {
+        return;
+    }
     unsigned int robot_idx = msg->robot_idx;
     if(robot_idx != self_robot_idx) {
         VectorDIM shape_min, shape_max;
@@ -121,7 +124,6 @@ void occupancyGridCallback(const rlss_ros::OccupancyGrid::ConstPtr& msg) {
 int main(int argc, char **argv) {
     ros::init(argc, argv, "planner");
     ros::NodeHandle nh;
-
 
     nh.getParam("robot_idx", self_robot_idx);
     int c_upto_d;
@@ -379,6 +381,11 @@ int main(int argc, char **argv) {
     while(ros::ok()) {
         ros::spinOnce();
 
+        if(self_robot_idx == 6) {
+            ROS_INFO_STREAM("desired_trajectory_set_time:");
+            ROS_INFO_STREAM(desired_trajectory_set_time);
+        }
+
         if(desired_trajectory_set_time != ros::Time(0)) {
             rlss_goal_selector->setOriginalTrajectory(desired_trajectory);
 
@@ -391,6 +398,9 @@ int main(int argc, char **argv) {
             ros::Duration time_on_trajectory =
                     current_time - desired_trajectory_set_time;
 
+            if(self_robot_idx == 6) {
+                ROS_INFO_STREAM("before plan");
+            }
             std::optional<PiecewiseCurve> curve = planner.plan(
                 time_on_trajectory.toSec(),
                 state,
@@ -398,7 +408,13 @@ int main(int argc, char **argv) {
                 *occupancy_grid_ptr
             );
 
+            if(self_robot_idx == 6) {
+                ROS_INFO_STREAM("after plan");
+            }
             if(curve) {
+                if(self_robot_idx == 6) {
+                    ROS_INFO_STREAM("curve");
+                }
                 PiecewiseCurve traj = *curve;
 
                 rlss_ros::PiecewiseTrajectory traj_msg;
@@ -417,6 +433,10 @@ int main(int argc, char **argv) {
                     traj_msg.pieces.push_back(bez_msg);
                 }
                 trajpub.publish(traj_msg);
+            } else {
+                if(self_robot_idx == 6) {
+                    ROS_INFO_STREAM("no curve");
+                }
             }
         } else {
             ROS_INFO_STREAM("desired trajectory not yet set.");

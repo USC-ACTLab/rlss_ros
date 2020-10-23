@@ -56,6 +56,8 @@
   <exec_depend>message_runtime</exec_depend>
   <depend>std_srvs</depend>
   <depend>std_msgs</depend>
+  <depend>tf</depend>
+  <depend>geometry_msgs</depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

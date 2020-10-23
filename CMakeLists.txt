@@ -16,6 +16,8 @@ find_package(
         create2_controller
         nav_msgs
         std_msgs
+        tf
+        geometry_msgs
 )
 
 find_package(
@@ -161,6 +163,20 @@ target_link_libraries(
 )
 add_dependencies(
         figure8
+        ${PROJECT_NAME}_generate_messages_cpp
+)
+
+add_executable(
+        figure8_3d
+        src/figure8_3d.cpp
+)
+target_link_libraries(
+        figure8_3d
+        ${catkin_LIBRARIES}
+        rlss
+)
+add_dependencies(
+        figure8_3d
         ${PROJECT_NAME}_generate_messages_cpp
 )
 
@@ -369,6 +385,34 @@ add_dependencies(
 target_compile_definitions(
         static_desired_trajectory_feeder_3d PUBLIC
         DIMENSION=3
+)
+
+add_executable(
+        hector_quadrotor_localizer
+        src/hector_quadrotor/localizer.cpp
+)
+target_link_libraries(
+        hector_quadrotor_localizer
+        ${catkin_LIBRARIES}
+        rlss
+)
+add_dependencies(
+        hector_quadrotor_localizer
+        ${PROJECT_NAME}_generate_message_cpp
+)
+
+add_executable(
+        hector_quadrotor_controller
+        src/hector_quadrotor/controller.cpp
+)
+target_link_libraries(
+        hector_quadrotor_controller
+        ${catkin_LIBRARIES}
+        rlss
+)
+add_dependencies(
+        hector_quadrotor_controller
+        ${PROJECT_NAME}_generate_message_cpp
 )
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

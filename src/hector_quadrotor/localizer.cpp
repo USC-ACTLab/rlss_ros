@@ -1,11 +1,11 @@
-#include "ros/ros.h"
-#include <rlss/internal/Util.hpp>
-#include <nav_msgs/Odometry.h>
+#include <ros/ros.h>
 #include <rlss_ros/RobotState.h>
 #include <rlss_ros/AABBCollisionShape.h>
 #include <rlss/CollisionShapes/AlignedBoxCollisionShape.hpp>
+#include <rlss/internal/Util.hpp>
+#include <tf/transform_listener.h>
 
-constexpr unsigned int DIM = DIMENSION;
+constexpr unsigned int DIM = 3U;
 
 using VectorDIM = rlss::internal::VectorDIM<double, DIM>;
 using StdVectorVectorDIM = rlss::internal::StdVectorVectorDIM<double, DIM>;
@@ -42,25 +42,8 @@ void publish() {
     }
 
     collision_shape_publisher.publish(cs_msg);
-
 }
 
-void odomCallback(const nav_msgs::Odometry::ConstPtr& msg) {
-    state[0](0) = msg->pose.pose.position.x;
-    state[0](1) = msg->pose.pose.position.y;
-    if(DIM == 3U) {
-        state[0](2) = msg->pose.pose.position.z;
-    }
-//
-//    if(continuity_upto_degree > 0) {
-//        state[1](0) = msg->twist.twist.linear.x;
-//        state[1](1) = msg->twist.twist.linear.y;
-//        if(DIM == 3U) {
-//            state[1](2) = msg->twist.twist.linear.z;
-//        }
-//    }
-    publish();
-}
 
 void fullDesiredStateCallback(const rlss_ros::RobotState::ConstPtr& msg) {
     if(msg->dimension != DIM) {
@@ -75,18 +58,13 @@ void fullDesiredStateCallback(const rlss_ros::RobotState::ConstPtr& msg) {
     }
 
     publish();
-
 }
 
-int main(int argc, char** argv) {
+
+
+int main(int argc, char* argv[]) {
     ros::init(argc, argv, "localizer");
     ros::NodeHandle nh;
-
-
-    if(DIM != 2U && DIM != 3U) {
-        ROS_ERROR_STREAM("DIM must be 2 or 3");
-        return 0;
-    }
 
     nh.getParam("robot_idx", self_robot_idx);
 
@@ -115,14 +93,42 @@ int main(int argc, char** argv) {
     AlignedBox colshape_at_zero(colshape_min, colshape_max);
     shape = std::make_shared<AABBCollisionShape>(colshape_at_zero);
 
-
-    ros::Subscriber odomsub = nh.subscribe("odom", 1, odomCallback);
-    ros::Subscriber fdssub = nh.subscribe("full_desired_state", 1, fullDesiredStateCallback);
-
     self_state_publisher = nh.advertise<rlss_ros::RobotState>("self_state", 1);
     collision_shape_publisher = nh.advertise<rlss_ros::AABBCollisionShape>("/other_robot_collision_shapes", 1);
 
-    ros::spin();
+    ros::Subscriber fdssub = nh.subscribe("full_desired_state", 1, fullDesiredStateCallback);
+
+    std::string world_frame;
+    nh.getParam("world_frame", world_frame);
+    std::string tf_prefix;
+    nh.getParam("tf_prefix", tf_prefix);
+    world_frame = tf_prefix + "/" + world_frame;
+    std::string robot_frame;
+    nh.getParam("base_link_frame", robot_frame);
+
+    std::cout << "world_frame: " << world_frame << ", robot_frame: " << robot_frame << std::endl;
+
+    tf::TransformListener listener;
+
+    ros::Rate rate(100);
+    while(ros::ok()) {
+        ros::spinOnce();
+
+        try {
+            tf::StampedTransform transform;
+            listener.lookupTransform(world_frame, robot_frame, ros::Time(0),
+                                     transform);
+            state[0](0) = transform.getOrigin().x();
+            state[0](1) = transform.getOrigin().y();
+            state[0](2) = transform.getOrigin().z();
+        } catch(...) {
+            ROS_WARN_STREAM("tf err");
+        }
+
+        publish();
+
+        rate.sleep();
+    }
 
     return 0;
 }

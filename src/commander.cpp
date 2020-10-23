@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
             msg.dimension = DIM;
 
             for(unsigned int i = 0; i <= continuity_upto_degree; i++) {
-                VectorDIM vec = traj.eval(std::min((current_time - last_traj_update_time).toSec() + dt, traj.maxParameter()), i);
+                VectorDIM vec = traj.eval(std::min((current_time - last_traj_update_time).toSec() + 2 * dt, traj.maxParameter()), i);
                 for(unsigned int d = 0; d < DIM; d++) {
                     msg.vars.push_back(vec(d));
                 }

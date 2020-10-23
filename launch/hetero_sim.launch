@@ -1,0 +1,191 @@
+<launch>
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/empty.world"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/turtlebot_sim.launch" ns="turtlebot1">
+        <arg name="robot_idx" value="1"/>
+        <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/turtlebot_1.json"/>
+        <arg name="x_pos" value="-3.51892"/>
+        <arg name="y_pos" value="1.88924"/>
+        <arg name="z_pos" value="0"/>
+        <arg name="yaw_pos" value="2.6488776570437156"/>
+        <arg name="robot_frame" value="turtlebot1/base_footprint"/>
+        <arg name="parent_frame" value="turtlebot1/odom"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+    </include>
+
+
+    <include file="$(find rlss_ros)/launch/turtlebot_sim.launch" ns="turtlebot2">
+        <arg name="robot_idx" value="2"/>
+        <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/turtlebot_2.json"/>
+        <arg name="x_pos" value="-4.06574"/>
+        <arg name="y_pos" value="0.859075"/>
+        <arg name="z_pos" value="0"/>
+        <arg name="yaw_pos" value="-0.29015609266903486"/>
+        <arg name="robot_frame" value="turtlebot2/base_footprint"/>
+        <arg name="parent_frame" default="turtlebot2/odom"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/turtlebot_sim.launch" ns="turtlebot3">
+        <arg name="robot_idx" value="3"/>
+        <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/turtlebot_3.json"/>
+        <arg name="x_pos" value="-4.05509"/>
+        <arg name="y_pos" value="-0.438224"/>
+        <arg name="z_pos" value="0"/>
+        <arg name="yaw_pos" value="-0.29015609266903486"/>
+        <arg name="robot_frame" value="turtlebot3/base_footprint"/>
+        <arg name="parent_frame" default="turtlebot3/odom"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/turtlebot_sim.launch" ns="turtlebot4">
+        <arg name="robot_idx" value="4"/>
+        <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/turtlebot_4.json"/>
+        <arg name="x_pos" value="2.29591"/>
+        <arg name="y_pos" value="-0.685449"/>
+        <arg name="z_pos" value="0"/>
+        <arg name="yaw_pos" value="-0.29015609266903486"/>
+        <arg name="robot_frame" value="turtlebot4/base_footprint"/>
+        <arg name="parent_frame" default="turtlebot4/odom"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/turtlebot_sim.launch" ns="turtlebot5">
+        <arg name="robot_idx" value="5"/>
+        <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/turtlebot_5.json"/>
+        <arg name="x_pos" value="2.94743"/>
+        <arg name="y_pos" value="0.109471"/>
+        <arg name="z_pos" value="0"/>
+        <arg name="yaw_pos" value="-0.29015609266903486"/>
+        <arg name="robot_frame" value="turtlebot5/base_footprint"/>
+        <arg name="parent_frame" default="turtlebot5/odom"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/turtlebot_sim.launch" ns="turtlebot6">
+        <arg name="robot_idx" value="6"/>
+        <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/turtlebot_6.json"/>
+        <arg name="x_pos" value="2.94066"/>
+        <arg name="y_pos" value="1.09919"/>
+        <arg name="z_pos" value="0"/>
+        <arg name="yaw_pos" value="-0.29015609266903486"/>
+        <arg name="robot_frame" value="turtlebot6/base_footprint"/>
+        <arg name="parent_frame" default="turtlebot6/odom"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector1">
+        <arg name="robot_idx" value="7"/>
+        <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/hector_1.json"/>
+        <arg name="x_pos" value="-8"/>
+        <arg name="y_pos" value="-8"/>
+        <arg name="z_pos" value="0.25"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" value="0.1"/>
+        <arg name="obstacles_directory" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/3d/gazebo_sim"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector2">
+        <arg name="robot_idx" value="8"/>
+        <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/hector_2.json"/>
+        <arg name="x_pos" value="12"/>
+        <arg name="y_pos" value="12"/>
+        <arg name="z_pos" value="0.25"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+        <arg name="obstacles_directory" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/3d/gazebo_sim"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector3">
+        <arg name="robot_idx" value="9"/>
+        <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/hector_3.json"/>
+        <arg name="x_pos" value="8"/>
+        <arg name="y_pos" value="-8"/>
+        <arg name="z_pos" value="0.25"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+        <arg name="obstacles_directory" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/3d/gazebo_sim"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector4">
+        <arg name="robot_idx" value="10"/>
+        <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/hector_4.json"/>
+        <arg name="x_pos" value="-8"/>
+        <arg name="y_pos" value="8"/>
+        <arg name="z_pos" value="0.25"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+        <arg name="obstacles_directory" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/3d/gazebo_sim"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector5">
+        <arg name="robot_idx" value="11"/>
+        <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/hector_5.json"/>
+        <arg name="x_pos" value="-11"/>
+        <arg name="y_pos" value="6"/>
+        <arg name="z_pos" value="0.25"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+        <arg name="obstacles_directory" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/3d/gazebo_sim"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector6">
+        <arg name="robot_idx" value="12"/>
+        <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/hector_6.json"/>
+        <arg name="x_pos" value="11"/>
+        <arg name="y_pos" value="6"/>
+        <arg name="z_pos" value="0.25"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+        <arg name="obstacles_directory" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/3d/gazebo_sim"/>
+    </include>
+
+<!--    <node pkg="gazebo_ros" name="box1" type="spawn_model"-->
+<!--          args="-file $(find rlss_ros)/urdf/box.urdf-->
+<!--           -urdf-->
+<!--           -x 5-->
+<!--           -y -4-->
+<!--           -z 0-->
+<!--           -model box1"-->
+<!--          respawn="false"/>-->
+
+    <node pkg="gazebo_ros" name="box2" type="spawn_model"
+          args="-file $(find rlss_ros)/urdf/box.urdf
+           -urdf
+           -x 6
+           -y 7
+           -z 0
+           -model box2"
+          respawn="false"/>
+
+<!--    <node pkg="gazebo_ros" name="box3" type="spawn_model"-->
+<!--          args="-file $(find rlss_ros)/urdf/box.urdf-->
+<!--           -urdf-->
+<!--           -x 0-->
+<!--           -y 0-->
+<!--           -z 0-->
+<!--           -model box3"-->
+<!--          respawn="false"/>-->
+
+<!--    <node pkg="gazebo_ros" name="box4" type="spawn_model"-->
+<!--          args="-file $(find rlss_ros)/urdf/box.urdf-->
+<!--           -urdf-->
+<!--           -x -5-->
+<!--           -y -4-->
+<!--           -z 0-->
+<!--           -model box4"-->
+<!--          respawn="false"/>-->
+</launch>

@@ -34,8 +34,12 @@ int main(int argc, char **argv) {
         occ_step_size(i) = step_size[i];
     }
 
+    ROS_INFO_STREAM(occ_step_size.transpose());
     OccupancyGrid occupancy_grid(occ_step_size);
+    boost::filesystem::path p(obstacles_directory);
+    std::cout << std::endl;
     for(auto& p: fs::directory_iterator(obstacles_directory)) {
+        ROS_INFO_STREAM(p.path().string());
         std::fstream obstacle_file(p.path().string(), std::ios_base::in);
         std::string type;
         obstacle_file >> type;
