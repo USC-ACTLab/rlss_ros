@@ -1,0 +1,33 @@
+<launch>
+    <arg name="port" default="/dev/ttySAC0" />
+    <arg name="robot_frame" default="create8"/>
+    <arg name="parent_frame" default="odom"/>
+    <arg name="robot_name" default="create8"/>
+    <arg name="machine_host" default="create8"/>
+    <arg name="machine_username" default="odroid"/>
+    <arg name="machine_password" default="odroid"/>
+
+    <group>
+        <machine
+            name="$(arg robot_name)"
+            address="$(arg machine_host)"
+            user="$(arg machine_username)"
+            password="$(arg machine_password)"
+        >
+        </machine>
+
+        <node name="driver" pkg="create2_driver" type="create2_driver_node" output="screen">
+            <param name="port" value="$(arg port)" />
+            <param name="brcPin" value="24" />
+            <param name="useBrcPin" value="true" />
+        </node>
+    </group>
+
+    <node name="controller" pkg="create2_controller" type="trajectory_controller" output="screen">
+        <param name="frame" value="$(arg robot_frame)" />
+        <param name="parentFrame" value="$(arg parent_frame)" />
+        <param name="Kx" value="5.0" />
+        <param name="Ky" value="10.0" />
+        <param name="Ktheta" value="50.0" />
+    </node>
+</launch>

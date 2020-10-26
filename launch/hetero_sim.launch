@@ -87,7 +87,7 @@
         <arg name="replanning_period" default="0.1"/>
     </include>
 
-    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector1">
+    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector7">
         <arg name="robot_idx" value="7"/>
         <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/hector_1.json"/>
         <arg name="x_pos" value="-8"/>
@@ -98,7 +98,7 @@
         <arg name="obstacles_directory" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/3d/gazebo_sim"/>
     </include>
 
-    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector2">
+    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector8">
         <arg name="robot_idx" value="8"/>
         <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/hector_2.json"/>
         <arg name="x_pos" value="12"/>
@@ -109,7 +109,7 @@
         <arg name="obstacles_directory" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/3d/gazebo_sim"/>
     </include>
 
-    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector3">
+    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector9">
         <arg name="robot_idx" value="9"/>
         <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/hector_3.json"/>
         <arg name="x_pos" value="8"/>
@@ -120,7 +120,7 @@
         <arg name="obstacles_directory" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/3d/gazebo_sim"/>
     </include>
 
-    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector4">
+    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector10">
         <arg name="robot_idx" value="10"/>
         <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/hector_4.json"/>
         <arg name="x_pos" value="-8"/>
@@ -131,7 +131,7 @@
         <arg name="obstacles_directory" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/3d/gazebo_sim"/>
     </include>
 
-    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector5">
+    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector11">
         <arg name="robot_idx" value="11"/>
         <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/hector_5.json"/>
         <arg name="x_pos" value="-11"/>
@@ -142,7 +142,7 @@
         <arg name="obstacles_directory" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/3d/gazebo_sim"/>
     </include>
 
-    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector6">
+    <include file="$(find rlss_ros)/launch/hector_quadrotor_sim.launch" ns="hector12">
         <arg name="robot_idx" value="12"/>
         <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/hector_6.json"/>
         <arg name="x_pos" value="11"/>

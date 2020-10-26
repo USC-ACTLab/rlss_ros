@@ -1,0 +1,34 @@
+<launch>
+    <arg name="server" default="vicon"/>
+    <arg name="world_frame" default="world"/>
+
+    <node pkg="vrpn_client_ros" type="vrpn_client_node" name="vrpn_client_node" output="screen">
+        <rosparam subst_value="true">
+          server: $(arg server)
+          port: 3883
+
+          update_frequency: 100.0
+          frame_id: $(arg world_frame)
+
+          # Use the VRPN server's time, or the client's ROS time.
+          use_server_time: false
+          broadcast_tf: true
+
+          # Must either specify refresh frequency > 0.0, or a list of trackers to create
+          refresh_tracker_frequency: 2.0
+          #trackers:
+          #- FirstTracker
+          #- SecondTracker
+        </rosparam>
+    </node>
+
+
+    <include file="$(find rlss_ros)/launch/create2_phy.launch" ns="create8">
+        <arg name="robot_name" value="create8"/>
+        <arg name="robot_frame" value="create8"/>
+        <arg name="parent_frame" value="$(arg world_frame)"/>
+        <arg name="machine_host" value="create8"/>
+        <arg name="machine_username" value="odroid"/>
+        <arg name="machine_password" value="odroid"/>
+    </include>
+</launch>

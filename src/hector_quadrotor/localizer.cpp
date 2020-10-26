@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
     int c_u_d;
     nh.getParam("continuity_upto_degree", c_u_d);
     continuity_upto_degree = c_u_d;
-    state.resize(continuity_upto_degree, VectorDIM::Zero());
+    state.resize(continuity_upto_degree + 1, VectorDIM::Zero());
 
 
     std::vector<double> colshape_min_vec, colshape_max_vec;

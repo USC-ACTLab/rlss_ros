@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
     int c_u_d;
     nh.getParam("continuity_upto_degree", c_u_d);
     continuity_upto_degree = c_u_d;
-    desired_state.resize(c_u_d);
+    desired_state.resize(c_u_d + 1, VectorDIM::Zero());
 
     std::string world_frame;
     nh.getParam("world_frame", world_frame);
