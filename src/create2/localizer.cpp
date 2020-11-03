@@ -4,6 +4,7 @@
 #include <rlss_ros/RobotState.h>
 #include <rlss_ros/AABBCollisionShape.h>
 #include <rlss/CollisionShapes/AlignedBoxCollisionShape.hpp>
+#include <tf/transform_listener.h>
 
 constexpr unsigned int DIM = DIMENSION;
 
@@ -45,22 +46,22 @@ void publish() {
 
 }
 
-void odomCallback(const nav_msgs::Odometry::ConstPtr& msg) {
-    state[0](0) = msg->pose.pose.position.x;
-    state[0](1) = msg->pose.pose.position.y;
-    if(DIM == 3U) {
-        state[0](2) = msg->pose.pose.position.z;
-    }
-//
-//    if(continuity_upto_degree > 0) {
-//        state[1](0) = msg->twist.twist.linear.x;
-//        state[1](1) = msg->twist.twist.linear.y;
-//        if(DIM == 3U) {
-//            state[1](2) = msg->twist.twist.linear.z;
-//        }
+//void odomCallback(const nav_msgs::Odometry::ConstPtr& msg) {
+//    state[0](0) = msg->pose.pose.position.x;
+//    state[0](1) = msg->pose.pose.position.y;
+//    if(DIM == 3U) {
+//        state[0](2) = msg->pose.pose.position.z;
 //    }
-    publish();
-}
+////
+////    if(continuity_upto_degree > 0) {
+////        state[1](0) = msg->twist.twist.linear.x;
+////        state[1](1) = msg->twist.twist.linear.y;
+////        if(DIM == 3U) {
+////            state[1](2) = msg->twist.twist.linear.z;
+////        }
+////    }
+//    publish();
+//}
 
 void fullDesiredStateCallback(const rlss_ros::RobotState::ConstPtr& msg) {
     if(msg->dimension != DIM) {
@@ -74,7 +75,6 @@ void fullDesiredStateCallback(const rlss_ros::RobotState::ConstPtr& msg) {
         }
     }
 
-    publish();
 
 }
 
@@ -116,11 +116,38 @@ int main(int argc, char** argv) {
     shape = std::make_shared<AABBCollisionShape>(colshape_at_zero);
 
 
-    ros::Subscriber odomsub = nh.subscribe("odom", 1, odomCallback);
+//    ros::Subscriber odomsub = nh.subscribe("odom", 1, odomCallback);
     ros::Subscriber fdssub = nh.subscribe("full_desired_state", 1, fullDesiredStateCallback);
 
     self_state_publisher = nh.advertise<rlss_ros::RobotState>("self_state", 1);
     collision_shape_publisher = nh.advertise<rlss_ros::AABBCollisionShape>("/other_robot_collision_shapes", 1);
+
+    std::string parent_frame;
+    nh.getParam("parent_frame", parent_frame);
+    std::string robot_frame;
+    nh.getParam("robot_frame", robot_frame);
+
+    ros::Rate rate(100);
+    tf::TransformListener listener;
+    while(ros::ok()) {
+        ros::spinOnce();
+
+        tf::StampedTransform transform;
+        try {
+            listener.lookupTransform(parent_frame, robot_frame, ros::Time(0), transform);
+            state[0](0) = transform.getOrigin().x();
+            state[0](1) = transform.getOrigin().y();
+
+            if(DIM == 3U) {
+                state[0](2) = transform.getOrigin().z();
+            }
+
+        } catch(tf::TransformException ex) {
+            ROS_WARN("%s", ex.what());
+        }
+        publish();
+        rate.sleep();
+    }
 
     ros::spin();
 

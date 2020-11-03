@@ -1,17 +1,13 @@
 <launch>
     <!-- MACHINE PARAMETERS -->
-    <arg name="robot_name" default="create8"/>
-    <arg name="machine_host" default="create8"/>
+    <arg name="robot_name" default="turtlebot1"/>
+    <arg name="machine_host" default="turtlebot1"/>
     <arg name="machine_username" default="odroid"/>
     <arg name="machine_password" default="odroid"/>
     <arg name="env_loader_path" default="/home/odroid/env-loader.sh"/>
 
-
-    <!-- DRIVER PARAMETERS -->
-    <arg name="port" default="/dev/ttySAC0" />
-
-    <arg name="robot_frame" default="create8"/>
-    <arg name="parent_frame" default="odom"/>
+    <arg name="robot_frame" default="turtlebot1"/>
+    <arg name="parent_frame" default="world"/>
 
     <!-- ONLY ORIGINAL TRAJECTORY IS READ FROM HERE -->
     <arg name="robot_description_path" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/turtlebot_1.json"/>
@@ -32,8 +28,8 @@
     <arg name="maximum_derivative_magnitude_magnitudes" default="[0.25, 0.8]"/>
     <arg name="workspace_min" default="[-10, -10]"/>
     <arg name="workspace_max" default="[10, 10]"/>
-    <arg name="collision_shape_at_zero_min" default="[-0.3, -0.3]"/>
-    <arg name="collision_shape_at_zero_max" default="[0.3, 0.3]"/>
+    <arg name="collision_shape_at_zero_min" default="[-0.35, -0.35]"/>
+    <arg name="collision_shape_at_zero_max" default="[0.35, 0.35]"/>
     <arg name="soft_optimization_parameters/robot_to_robot_hyperplane_constraints_enabled" default="true"/>
     <arg name="soft_optimization_parameters/robot_to_obstacle_hyperplane_constraints_enabled" default="true"/>
     <arg name="soft_optimization_parameters/initial_point_constraints_enabled" default="true"/>
@@ -88,6 +84,7 @@
     <rosparam param="robot_frame" subst_value="True">$(arg robot_frame)</rosparam>
     <rosparam param="parent_frame" subst_value="True">$(arg parent_frame)</rosparam>
 
+
     <machine
         name="$(arg robot_name)"
         address="$(arg machine_host)"
@@ -97,19 +94,24 @@
     >
     </machine>
 
-    <node machine="$(arg robot_name)" name="driver" pkg="create2_driver" type="create2_driver_node">
-        <param name="port" value="$(arg port)" />
-        <param name="brcPin" value="24" />
-        <param name="useBrcPin" value="true" />
+    <node machine="$(arg robot_name)" pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/>
+
+    <node machine="$(arg robot_name)" pkg="nodelet" type="nodelet" name="mobile_base" args="load kobuki_node/KobukiNodelet mobile_base_nodelet_manager">
+        <rosparam file="$(find kobuki_node)/param/base.yaml" command="load"/>
+        <param name="publish_tf" value="false"/>
     </node>
 
+    <node machine="$(arg robot_name)" pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator" >
+        <rosparam command="load" file="$(find kobuki_node)/param/diagnostics.yaml" />
+    </node>
 
-    <node name="controller" pkg="create2_controller" type="trajectory_controller" output="screen">
+    <node name="controller" pkg="create2_controller" type="trajectory_controller_v2" output="screen">
         <param name="frame" value="$(arg robot_frame)" />
         <param name="parentFrame" value="$(arg parent_frame)" />
-        <param name="Kx" value="5.0" />
+        <param name="Kx" value="10.0" />
         <param name="Ky" value="10.0" />
-        <param name="Ktheta" value="50.0" />
+        <param name="Ktheta" value="25.0"/>
+        <remap from="cmd_vel" to="mobile_base/commands/velocity"/>
     </node>
 
 

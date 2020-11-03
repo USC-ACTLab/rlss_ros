@@ -1,6 +1,10 @@
 <launch>
     <arg name="server" default="vicon"/>
     <arg name="world_frame" default="world"/>
+    <arg name="2d_obstacles_directory" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/2d/hetero_phy_inc/"/>
+    <arg name="3d_obstacles_directory" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/3d/empty/"/>
+    <arg name="2d_step_size" default="[0.35, 0.35]"/>
+    <arg name="robot_trajectories" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero_phy"/>
 
     <node pkg="vrpn_client_ros" type="vrpn_client_node" name="vrpn_client_node" output="screen">
         <rosparam subst_value="true">
@@ -23,6 +27,22 @@
     </node>
 
 
+    <include file="$(find rlss_ros)/launch/create2_phy.launch" ns="create9">
+        <arg name="robot_name" value="create9"/>
+        <arg name="robot_frame" value="create9"/>
+        <arg name="parent_frame" value="$(arg world_frame)"/>
+        <arg name="machine_host" value="create9"/>
+        <arg name="machine_username" value="odroid"/>
+        <arg name="machine_password" value="odroid"/>
+
+        <arg name="robot_idx" value="1"/>
+        <arg name="robot_description_path" value="$(arg robot_trajectories)/create9.json"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+        <arg name="obstacles_directory" value="$(arg 2d_obstacles_directory)"/>
+        <arg name="occupancy_grid_step_size" default="$(arg 2d_step_size)"/>
+    </include>
+
     <include file="$(find rlss_ros)/launch/create2_phy.launch" ns="create8">
         <arg name="robot_name" value="create8"/>
         <arg name="robot_frame" value="create8"/>
@@ -30,5 +50,99 @@
         <arg name="machine_host" value="create8"/>
         <arg name="machine_username" value="odroid"/>
         <arg name="machine_password" value="odroid"/>
+
+        <arg name="robot_idx" value="2"/>
+        <arg name="robot_description_path" value="$(arg robot_trajectories)/create8.json"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+        <arg name="obstacles_directory" value="$(arg 2d_obstacles_directory)"/>
+        <arg name="occupancy_grid_step_size" default="$(arg 2d_step_size)"/>
     </include>
+
+    <include file="$(find rlss_ros)/launch/turtlebot3_phy.launch" ns="tb3_three">
+        <arg name="robot_name" value="tb3_three"/>
+        <arg name="robot_frame" value="tb3_three"/>
+        <arg name="parent_frame" value="$(arg world_frame)"/>
+        <arg name="machine_host" value="tb3-three"/>
+        <arg name="machine_username" value="actlab"/>
+        <arg name="machine_password" value="uscdrone"/>
+        <arg name="env_loader_path" value="/home/actlab/env-loader.sh"/>
+
+        <arg name="robot_idx" value="3"/>
+        <arg name="robot_description_path" value="$(arg robot_trajectories)/tb3_three.json"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+        <arg name="obstacles_directory" value="$(arg 2d_obstacles_directory)"/>
+        <arg name="occupancy_grid_step_size" default="$(arg 2d_step_size)"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/turtlebot3_phy.launch" ns="tb3_two">
+        <arg name="robot_name" value="tb3_two"/>
+        <arg name="robot_frame" value="tb3_two"/>
+        <arg name="parent_frame" value="$(arg world_frame)"/>
+        <arg name="machine_host" value="tb3-two"/>
+        <arg name="machine_username" value="odroid"/>
+        <arg name="machine_password" value="odroid"/>
+        <arg name="env_loader_path" value="/home/odroid/env-loader.sh"/>
+
+        <arg name="robot_idx" value="4"/>
+        <arg name="robot_description_path" value="$(arg robot_trajectories)/tb3_two.json"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+        <arg name="obstacles_directory" value="$(arg 2d_obstacles_directory)"/>
+        <arg name="occupancy_grid_step_size" default="$(arg 2d_step_size)"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/turtlebot3_phy.launch" ns="tb3_one">
+        <arg name="robot_name" value="tb3_one"/>
+        <arg name="robot_frame" value="tb3_one"/>
+        <arg name="parent_frame" value="$(arg world_frame)"/>
+        <arg name="machine_host" value="tb3-one"/>
+        <arg name="machine_username" value="actlab"/>
+        <arg name="machine_password" value="uscdrone"/>
+        <arg name="env_loader_path" value="/home/ceasar/env-loader.sh"/>
+
+        <arg name="robot_idx" value="5"/>
+        <arg name="robot_description_path" value="$(arg robot_trajectories)/tb3_one.json"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+        <arg name="obstacles_directory" value="$(arg 2d_obstacles_directory)"/>
+        <arg name="occupancy_grid_step_size" default="$(arg 2d_step_size)"/>
+    </include>
+
+
+    <include file="$(find rlss_ros)/launch/turtlebot2_phy.launch" ns="turtlebot2">
+        <arg name="robot_name" value="turtlebot2"/>
+        <arg name="robot_frame" value="turtlebot2"/>
+        <arg name="parent_frame" value="$(arg world_frame)"/>
+        <arg name="machine_host" value="turtlebot2"/>
+        <arg name="machine_username" value="odroid"/>
+        <arg name="machine_password" value="odroid"/>
+        <arg name="env_loader_path" value="/home/odroid/env-loader.sh"/>
+
+        <arg name="robot_idx" value="6"/>
+        <arg name="robot_description_path" value="$(arg robot_trajectories)/turtlebot2.json"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+        <arg name="obstacles_directory" value="$(arg 2d_obstacles_directory)"/>
+        <arg name="occupancy_grid_step_size" default="$(arg 2d_step_size)"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/turtlebot2_phy.launch" ns="turtlebot1">
+        <arg name="robot_name" value="turtlebot1"/>
+        <arg name="robot_frame" value="turtlebot1"/>
+        <arg name="parent_frame" value="$(arg world_frame)"/>
+        <arg name="machine_host" value="turtlebot1"/>
+        <arg name="machine_username" value="odroid"/>
+        <arg name="machine_password" value="odroid"/>
+        <arg name="env_loader_path" value="/home/odroid/env-loader.sh"/>
+
+        <arg name="robot_idx" value="7"/>
+        <arg name="robot_description_path" value="$(arg robot_trajectories)/turtlebot1.json"/>
+        <arg name="commander_dt" value="0.05"/>
+        <arg name="replanning_period" default="0.1"/>
+        <arg name="obstacles_directory" value="$(arg 2d_obstacles_directory)"/>
+        <arg name="occupancy_grid_step_size" default="$(arg 2d_step_size)"/>
+    </include>
+
 </launch>
