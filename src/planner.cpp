@@ -437,6 +437,7 @@ int main(int argc, char **argv) {
 //                if(self_robot_idx == 6) {
 //                    ROS_INFO_STREAM("no curve");
 //                }
+                ROS_WARN_STREAM("planner failed.");
             }
         } else {
             ROS_INFO_STREAM("desired trajectory not yet set.");

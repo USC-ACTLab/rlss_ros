@@ -29,7 +29,7 @@
     <arg name="continuity_upto_degree" default="2"/> <!-- used in commander as well -->
     <arg name="replanning_period" default="0.1"/>
     <arg name="maximum_derivative_magnitude_degrees" default="[1, 2]"/>
-    <arg name="maximum_derivative_magnitude_magnitudes" default="[0.25, 0.8]"/>
+    <arg name="maximum_derivative_magnitude_magnitudes" default="[0.25, 0.5]"/>
     <arg name="workspace_min" default="[-10, -10]"/>
     <arg name="workspace_max" default="[10, 10]"/>
     <arg name="collision_shape_at_zero_min" default="[-0.3, -0.3]"/>

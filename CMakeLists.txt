@@ -18,6 +18,7 @@ find_package(
         std_msgs
         tf
         geometry_msgs
+        crazyflie_driver
 )
 
 find_package(
@@ -414,6 +415,34 @@ add_dependencies(
         hector_quadrotor_controller
         ${PROJECT_NAME}_generate_message_cpp
 )
+
+add_executable(
+        cf2_state_reducer
+        src/cf2/state_reducer.cpp
+)
+target_link_libraries(
+        cf2_state_reducer
+        ${catkin_LIBRARIES}
+)
+add_dependencies(
+        cf2_state_reducer
+        ${PROJECT_NAME}_generate_messages_cpp
+)
+
+add_executable(
+        cf2_localizer
+        src/cf2/localizer.cpp
+)
+target_link_libraries(
+        cf2_localizer
+        ${catkin_LIBRARIES}
+        rlss
+)
+add_dependencies(
+        cf2_localizer
+        ${PROJECT_NAME}_generate_message_cpp
+)
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use

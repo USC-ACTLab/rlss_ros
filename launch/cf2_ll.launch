@@ -1,0 +1,37 @@
+<launch>
+    <include file="$(find rlss_ros)/launch/cf2_small_phy.launch" ns="cf25">
+        <arg name="robot_frame" value="cf25"/>
+        <arg name="robot_description_path" value="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero_phy_cf/cf2_25.json"/>
+        <arg name="robot_idx" value="1"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/cf2_small_phy.launch" ns="cf45">
+        <arg name="robot_frame" value="cf45"/>
+        <arg name="robot_description_path" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero_phy_cf/cf2_45.json"/>
+        <arg name="robot_idx" value="2"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/cf2_small_phy.launch" ns="cf11">
+        <arg name="robot_frame" value="cf11"/>
+        <arg name="robot_description_path" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero_phy_cf/cf2_11.json"/>
+        <arg name="robot_idx" value="3"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/cf2_small_phy.launch" ns="cf12">
+        <arg name="robot_frame" value="cf12"/>
+        <arg name="robot_description_path" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero_phy_cf/cf2_12.json"/>
+        <arg name="robot_idx" value="4"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/cf2_small_phy.launch" ns="cf37">
+        <arg name="robot_frame" value="cf37"/>
+        <arg name="robot_description_path" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero_phy_cf/cf2_37.json"/>
+        <arg name="robot_idx" value="5"/>
+    </include>
+
+    <include file="$(find rlss_ros)/launch/cf2_small_phy.launch" ns="cf17">
+        <arg name="robot_frame" value="cf17"/>
+        <arg name="robot_description_path" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero_phy_cf/cf2_17.json"/>
+        <arg name="robot_idx" value="6"/>
+    </include>
+</launch>

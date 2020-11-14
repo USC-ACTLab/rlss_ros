@@ -1,35 +1,21 @@
 <launch>
-    <!-- MACHINE PARAMETERS -->
-    <arg name="robot_name" default="turtlebot1"/>
-    <arg name="machine_host" default="turtlebot1"/>
-    <arg name="machine_username" default="odroid"/>
-    <arg name="machine_password" default="odroid"/>
-    <arg name="env_loader_path" default="/home/odroid/env-loader.sh"/>
-
-    <arg name="robot_frame" default="turtlebot1"/>
-    <arg name="parent_frame" default="world"/>
-
-    <!-- ONLY ORIGINAL TRAJECTORY IS READ FROM HERE -->
-    <arg name="robot_description_path" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/turtlebot_1.json"/>
-
     <!-- COMMANDER PARAMETERS -->
     <arg name="commander_dt" default="0.05"/>
 
     <!-- OBSTACLE FEEDER PARAMETERS -->
-    <arg name="obstacles_directory" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/2d/empty/"/>
-    <arg name="occupancy_grid_step_size" default="[0.5, 0.5]"/>
-
+    <arg name="obstacles_directory" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/3d/hetero_phy_redo"/>
+    <arg name="occupancy_grid_step_size" default="[0.4, 0.4, 0.4]"/>
 
     <!-- PLANNER PARAMETERS -->
     <arg name="robot_idx" default="1"/>
     <arg name="continuity_upto_degree" default="2"/> <!-- used in commander as well -->
-    <arg name="replanning_period" default="0.1"/>
+    <arg name="replanning_period" default="0.5"/>
     <arg name="maximum_derivative_magnitude_degrees" default="[1, 2]"/>
-    <arg name="maximum_derivative_magnitude_magnitudes" default="[0.5, 0.5]"/>
-    <arg name="workspace_min" default="[-10, -10]"/>
-    <arg name="workspace_max" default="[10, 10]"/>
-    <arg name="collision_shape_at_zero_min" default="[-0.35, -0.35]"/>
-    <arg name="collision_shape_at_zero_max" default="[0.35, 0.35]"/>
+    <arg name="maximum_derivative_magnitude_magnitudes" default="[1.0, 1.0]"/>
+    <arg name="workspace_min" default="[-7, -7, 0]"/>
+    <arg name="workspace_max" default="[7, 7, 3]"/>
+    <arg name="collision_shape_at_zero_min" default="[-0.1, -0.1, -0.2]"/>
+    <arg name="collision_shape_at_zero_max" default="[0.1, 0.1, 0.2]"/>
     <arg name="soft_optimization_parameters/robot_to_robot_hyperplane_constraints_enabled" default="true"/>
     <arg name="soft_optimization_parameters/robot_to_obstacle_hyperplane_constraints_enabled" default="true"/>
     <arg name="soft_optimization_parameters/initial_point_constraints_enabled" default="true"/>
@@ -48,6 +34,9 @@
     <arg name="rescaling_multiplier" default="1.2"/>
     <arg name="search_step" default="0.01"/>
     <arg name="num_bezier_control_points" default="[8, 8, 8, 8]"/>
+
+
+    <arg name="robot_description_path" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero_phy/cf2_25.json"/>
 
 
     <rosparam param="obstacles_directory" subst_value="True">$(arg obstacles_directory)</rosparam>
@@ -81,56 +70,29 @@
     <rosparam param="num_bezier_control_points" subst_value="True">$(arg num_bezier_control_points)</rosparam>
     <rosparam param="commander_dt" subst_value="True">$(arg commander_dt)</rosparam>
     <rosparam param="robot_description_path" subst_value="True">$(arg robot_description_path)</rosparam>
-    <rosparam param="robot_frame" subst_value="True">$(arg robot_frame)</rosparam>
+
+
+    <arg name="parent_frame" default="world"/>
+    <arg name="robot_frame" default="cf25"/>
+
     <rosparam param="parent_frame" subst_value="True">$(arg parent_frame)</rosparam>
+    <rosparam param="robot_frame" subst_value="True">$(arg robot_frame)</rosparam>
 
-
-    <machine
-        name="$(arg robot_name)"
-        address="$(arg machine_host)"
-        user="$(arg machine_username)"
-        password="$(arg machine_password)"
-        env-loader="$(arg env_loader_path)"
-    >
-    </machine>
-
-    <node machine="$(arg robot_name)" pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/>
-
-    <node machine="$(arg robot_name)" pkg="nodelet" type="nodelet" name="mobile_base" args="load kobuki_node/KobukiNodelet mobile_base_nodelet_manager">
-        <rosparam file="$(find kobuki_node)/param/base.yaml" command="load"/>
-        <param name="publish_tf" value="false"/>
+    <node pkg="rlss_ros" name="static_occupancy_grid_feeder" type="static_occupancy_grid_feeder_3d" required="true">
     </node>
 
-    <node machine="$(arg robot_name)" pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator" >
-        <rosparam command="load" file="$(find kobuki_node)/param/diagnostics.yaml" />
+    <node pkg="rlss_ros" name="planner" type="planner_3d" required="true" output="screen">
     </node>
 
-    <node name="controller" pkg="create2_controller" type="trajectory_controller_v2" output="screen">
-        <param name="frame" value="$(arg robot_frame)" />
-        <param name="parentFrame" value="$(arg parent_frame)" />
-        <param name="Kx" value="10.0" />
-        <param name="Ky" value="10.0" />
-        <param name="Ktheta" value="25.0"/>
-        <remap from="cmd_vel" to="mobile_base/commands/velocity"/>
+    <node pkg="rlss_ros" name="commander" type="commander_3d" required="true" output="screen">
     </node>
 
-
-    <node pkg="rlss_ros" name="static_occupancy_grid_feeder" type="static_occupancy_grid_feeder_2d">
+    <node name="desired_traj_feeder" pkg="rlss_ros" type="static_desired_trajectory_feeder_3d" required="true"  output="screen">
     </node>
 
-    <node pkg="rlss_ros" name="planner" type="planner_2d" required="true" output="screen">
+    <node pkg="rlss_ros" name="reducer" type="cf2_state_reducer" required="true" output="screen">
     </node>
 
-    <node pkg="rlss_ros" name="commander" type="commander_2d" required="true" output="screen">
-    </node>
-
-    <node pkg="rlss_ros" name="reducer" type="create2_state_reducer" required="true" output="screen">
-    </node>
-
-    <node name="localizer" pkg="rlss_ros" type="create2_localizer_2d" output="screen" required="true">
-    </node>
-
-    <node name="desired_traj_feeder" pkg="rlss_ros" type="static_desired_trajectory_feeder_2d" required="true" output="screen">
-    </node>
+    <node pkg="rlss_ros" name="localizer" type="cf2_localizer" required="true" output="screen"/>
 
 </launch>

@@ -1,7 +1,7 @@
 <launch>
     <arg name="server" default="vicon"/>
     <arg name="world_frame" default="world"/>
-    <arg name="2d_obstacles_directory" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/2d/hetero_phy_inc/"/>
+    <arg name="2d_obstacles_directory" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/2d/empty/"/>
     <arg name="3d_obstacles_directory" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/3d/empty/"/>
     <arg name="2d_step_size" default="[0.35, 0.35]"/>
     <arg name="robot_trajectories" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero_phy"/>
