@@ -1,14 +1,11 @@
 <launch>
+
+    <arg name="ns" default=""/>
+
     <!-- COMMANDER PARAMETERS -->
     <arg name="commander_dt" default="0.05"/>
 
-    <!-- OBSTACLE FEEDER PARAMETERS -->
-    <arg name="obstacles_directory" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/obstacle_descriptions/3d/empty"/>
-    <arg name="occupancy_grid_step_size" default="[0.5, 0.5, 0.5]"/>
-
-
     <!-- PLANNER PARAMETERS -->
-    <arg name="robot_idx" default="1"/>
     <arg name="continuity_upto_degree" default="2"/> <!-- used in commander as well -->
     <arg name="replanning_period" default="0.1"/>
     <arg name="maximum_derivative_magnitude_degrees" default="[1, 2]"/>
@@ -35,23 +32,19 @@
     <arg name="rescaling_multiplier" default="1.2"/>
     <arg name="search_step" default="0.01"/>
     <arg name="num_bezier_control_points" default="[8, 8, 8, 8]"/>
+    <arg name="reference_frame" default="world"/>
+    <arg name="robot_frame" default="$(arg ns)/base_link"/>
 
     <!-- CONTROLLER PARAMETERS -->
 <!--    <arg name="tf_prefix" default=""/>-->
 <!--    <arg name="tf_prefix" default="$(optenv ROS_NAMESPACE)"/>-->
 <!--    <arg name="world_frame" default="world"/>-->
 <!--    <arg name="robot_frame" default="$(arg tf_prefix)/base_link"/>-->
-    <arg name="kpp" default="1.5"/>
+    <arg name="kpp" default="5.5"/>
     <arg name="kpv" default="0"/>
-    <arg name="kdp" default="3"/>
+    <arg name="kdp" default="2"/>
     <arg name="kdv" default="0"/>
 
-    <arg name="robot_description_path" default="/home/baskin/rlss_ws/src/rlss-ros/third_party/rlss/examples/inputs/demo_descriptions/3d/hetero/hector_1.json"/>
-
-
-    <rosparam param="obstacles_directory" subst_value="True">$(arg obstacles_directory)</rosparam>
-    <rosparam param="occupancy_grid_step_size" subst_value="True">$(arg occupancy_grid_step_size)</rosparam>
-    <rosparam param="robot_idx" subst_value="True">$(arg robot_idx)</rosparam>
     <rosparam param="continuity_upto_degree" subst_value="True">$(arg continuity_upto_degree)</rosparam>
     <rosparam param="replanning_period" subst_value="True">$(arg replanning_period)</rosparam>
     <rosparam param="maximum_derivative_magnitude_degrees" subst_value="True">$(arg maximum_derivative_magnitude_degrees)</rosparam>
@@ -79,24 +72,12 @@
     <rosparam param="search_step" subst_value="True">$(arg search_step)</rosparam>
     <rosparam param="num_bezier_control_points" subst_value="True">$(arg num_bezier_control_points)</rosparam>
     <rosparam param="commander_dt" subst_value="True">$(arg commander_dt)</rosparam>
-    <rosparam param="robot_description_path" subst_value="True">$(arg robot_description_path)</rosparam>
-<!--    <rosparam param="world_frame" subst_value="True">$(arg world_frame)</rosparam>-->
-<!--    <rosparam param="robot_frame" subst_value="True">$(arg robot_frame)</rosparam>-->
+    <rosparam param="reference_frame" subst_value="True">$(arg reference_frame)</rosparam>
+    <rosparam param="robot_frame" subst_value="True">$(arg robot_frame)</rosparam>
 
-    <node pkg="rlss_ros" name="static_occupancy_grid_feeder" type="static_occupancy_grid_feeder_3d" required="true">
-    </node>
-
-    <node pkg="rlss_ros" name="planner" type="planner_3d" required="true" output="screen">
-    </node>
-
-    <node pkg="rlss_ros" name="commander" type="commander_3d" required="true" output="screen">
-    </node>
-
+    <node pkg="rlss_ros" name="planner" type="planner_3d" required="true" output="screen"/>
+    <node pkg="rlss_ros" name="commander" type="commander_3d" required="true" output="screen"/>
     <node pkg="rlss_ros" name="localizer" type="hector_quadrotor_localizer" required="true" output="screen"/>
-
-    <node name="desired_traj_feeder" pkg="rlss_ros" type="static_desired_trajectory_feeder_3d" required="true"  output="screen">
-    </node>
-
     <node pkg="rlss_ros" name="controller" type="hector_quadrotor_controller" required="true" output="screen">
         <param name="kpp" value="$(arg kpp)"/>
         <param name="kpv" value="$(arg kpv)"/>
@@ -104,20 +85,17 @@
         <param name="kdv" value="$(arg kdv)"/>
     </node>
 
-
     <arg name="x_pos" default="0.0"/>
     <arg name="y_pos" default="0.0"/>
     <arg name="z_pos" default="0.0"/>
     <include file="$(find rlss_ros)/launch/spawn_quadrotor_rlss.launch">
+        <arg name="ns" value="$(arg ns)"/>
         <arg name="x" value="$(arg x_pos)"/>
         <arg name="y" value="$(arg y_pos)"/>
         <arg name="z" value="$(arg z_pos)"/>
-        <arg name="name" value="hector$(arg robot_idx)"/>
-        <arg name="tf_prefix" value="hector$(arg robot_idx)"/>
     </include>
 
-<!--    <node pkg="rosservice" type="rosservice" name="enable_motors" args='call &#45;&#45;wait enable_motors "enable: true"'>-->
-
-<!--    </node>-->
+    <node pkg="rosservice" type="rosservice" name="enable_motors" args='call --wait enable_motors "enable: true"'>
+    </node>
 
 </launch>

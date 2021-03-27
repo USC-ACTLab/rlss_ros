@@ -1,2 +1,2 @@
-uint32 robot_idx
+string robot_namespace
 AABB bbox

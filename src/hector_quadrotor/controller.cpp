@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include <rlss_ros/RobotState.h>
+#include <rlss_ros/SetOnOff.h>
 #include <rlss/internal/Util.hpp>
 #include <tf/transform_listener.h>
 //#include <tf/Quaternion.h>
@@ -14,8 +15,11 @@ using StdVectorVectorDIM = rlss::internal::StdVectorVectorDIM<double, DIM>;
 
 
 StdVectorVectorDIM desired_state;
+StdVectorVectorDIM current_state;
 unsigned int continuity_upto_degree;
 bool desired_state_set = false;
+bool current_state_set = false;
+bool enabled = false;
 
 void fullDesiredStateCallback(const rlss_ros::RobotState::ConstPtr& msg) {
     if(msg->dimension != DIM) {
@@ -27,6 +31,23 @@ void fullDesiredStateCallback(const rlss_ros::RobotState::ConstPtr& msg) {
         desired_state[i / DIM](i % DIM) = msg->vars[i];
     }
     desired_state_set = true;
+}
+
+void fullCurrentStateCallback(const rlss_ros::RobotState::ConstPtr& msg) {
+    if(msg->dimension != DIM) {
+        ROS_WARN_STREAM("dim mismatch");
+        return;
+    }
+
+    for(std::size_t i = 0; i < std::min(static_cast<unsigned int>(msg->vars.size()), DIM * (continuity_upto_degree + 1)); i++) {
+        current_state[i / DIM](i % DIM) = msg->vars[i];
+    }
+    current_state_set = true;
+}
+
+bool setOnOffCallback(rlss_ros::SetOnOff::Request& req, rlss_ros::SetOnOff::Response& res) {
+    enabled = req.on;
+    return true;
 }
 
 VectorDIM prev_pos;
@@ -43,17 +64,7 @@ int main(int argc, char* argv[]) {
     nh.getParam("continuity_upto_degree", c_u_d);
     continuity_upto_degree = c_u_d;
     desired_state.resize(c_u_d + 1, VectorDIM::Zero());
-
-    std::string world_frame;
-    nh.getParam("world_frame", world_frame);
-    std::string tf_prefix;
-    nh.getParam("tf_prefix", tf_prefix);
-    world_frame = tf_prefix + "/" + world_frame;
-    std::string robot_frame;
-    nh.getParam("base_link_frame", robot_frame);
-
-    std::cout << "world_frame: " << world_frame << ", robot_frame: " << robot_frame << std::endl;
-
+    current_state.resize(c_u_d + 1, VectorDIM::Zero());
 
     ros::NodeHandle pnh("~");
     double kpp, kpv, kdp, kdv;
@@ -63,48 +74,39 @@ int main(int argc, char* argv[]) {
     pnh.getParam("kdv", kdv);
     std::cout << "kpp: " << kpp << ", kpv: " << kpv << ", kdp: " << kdp << ", kdv: " << kdv << std::endl;
 
-    ros::Subscriber sub = nh.subscribe("full_desired_state", 1, fullDesiredStateCallback);
+    ros::Subscriber fdssub = nh.subscribe("FullDesiredState", 1, fullDesiredStateCallback);
+    ros::Subscriber fcssub = nh.subscribe("FullCurrentState", 1, fullCurrentStateCallback);
+    ros::ServiceServer setonoffserv = pnh.advertiseService("SetOnOff", setOnOffCallback);
+
+    std::string reference_frame;
+    nh.getParam("reference_frame", reference_frame);
+    std::string robot_frame;
+    nh.getParam("base_link_frame", robot_frame);
+
+    std::cout << "reference_frame: " << reference_frame << ", robot_frame: " << robot_frame << std::endl;
 
     ros::Publisher pub = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-//    ros::Publisher ss = nh.advertise<geometry_msgs::Pose>("current_pose", 1);
-
     tf::TransformListener listener;
 
-    listener.waitForTransform(world_frame, robot_frame, ros::Time::now(), ros::Duration(3.0));
+    listener.waitForTransform(reference_frame, robot_frame, ros::Time::now(), ros::Duration(3.0));
 
     ros::Rate rate(100);
 
     while(ros::ok()) {
         ros::spinOnce();
-        if(desired_state_set) {
-            tf::Vector3 pos;
+        if(desired_state_set && current_state_set && enabled) {
             tf::Quaternion ori;
 
             tf::StampedTransform transform;
-            listener.lookupTransform(world_frame, robot_frame, ros::Time(0), transform);
-            pos = transform.getOrigin();
+            listener.lookupTransform(reference_frame, robot_frame, ros::Time(0), transform);
             ori = transform.getRotation();
 
-//            geometry_msgs::Pose pose; //debug
-//            pose.position.x = pos.x();
-//            pose.position.y = pos.y();
-//            pose.position.z = pos.z();
-//            ss.publish(pose);
-
-            VectorDIM current_pos(pos.x(), pos.y(), pos.z());
-
-//            std::cout << "current_pos: " << current_pos.transpose() << std::endl;
-//            std::cout << "desired_pos: " << desired_state[0].transpose() << std::endl;
-
-            VectorDIM pos_error = desired_state[0] - current_pos;
-//            std::cout << "pos_error: " << pos_error.transpose() << std::endl;
-            VectorDIM input = kpp * pos_error;
-//            std::cout << "input: " << input.transpose() << std::endl;
+            VectorDIM pos_error = desired_state[0] - current_state[0];
+            VectorDIM input = desired_state[1] + kpp * pos_error;
 
             if(prev_pos_time != ros::Time(0)) {
                 input += kdp * (pos_error - prev_pos_error);
-
-                VectorDIM vel = (current_pos - prev_pos) /
+                VectorDIM vel = (current_state[0] - prev_pos) /
                                 (ros::Time::now() - prev_pos_time).toSec();
                 VectorDIM vel_error = (desired_state[1] - vel);
                 input += kpv * vel_error;
@@ -116,10 +118,9 @@ int main(int argc, char* argv[]) {
             }
 
             prev_pos_error = pos_error;
-            prev_pos = current_pos;
+            prev_pos = current_state[0];
             prev_pos_time = ros::Time::now();
 
-//            std::cout << "input: " << input.transpose() << std::endl;
 
             tf::Vector3 in_v(input(0), input(1), input(2));
             in_v = tf::quatRotate(ori.inverse(), in_v);

@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 
 <launch>
-    <arg name="name" default="quadrotor"/>
+    <arg name="ns" default=""/>
     <arg name="model" default="$(find hector_quadrotor_description)/urdf/quadrotor.gazebo.xacro"/>
     <arg name="controllers" default="
     controller/position
     controller/velocity
     controller/attitude
     "/>
-    <arg name="tf_prefix" default="$(optenv ROS_NAMESPACE)"/>
+    <arg name="tf_prefix" default="$(arg ns)"/>
 
     <arg name="x" default="0.0"/>
     <arg name="y" default="0.0"/>
@@ -19,7 +19,7 @@
     <arg name="use_pose_estimation" if="$(arg use_ground_truth_for_control)" default="false"/>
     <arg name="use_pose_estimation" unless="$(arg use_ground_truth_for_control)" default="true"/>
 
-    <arg name="world_frame" default="world"/> <!-- This should actually be "/world". See https://github.com/ros-simulation/gazebo_ros_pkgs/pull/324 -->
+    <arg name="world_frame" default="/world"/> <!-- This should actually be "/world". See https://github.com/ros-simulation/gazebo_ros_pkgs/pull/324 -->
     <arg name="base_link_frame" default="$(arg tf_prefix)/base_link"/>
 
     <!-- send the robot XML to param server -->
@@ -82,7 +82,7 @@
            -x $(arg x)
            -y $(arg y)
            -z $(arg z)
-           -model $(arg name)"
+           -model $(arg ns)"
           respawn="false" output="screen"/>
 
 </launch>

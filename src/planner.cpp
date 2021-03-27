@@ -17,6 +17,8 @@
 #include <rlss/ValidityCheckers/RLSSValidityChecker.hpp>
 #include <rlss/GoalSelectors/RLSSGoalSelector.hpp>
 #include <std_msgs/Time.h>
+#include <rlss_ros/SetOnOff.h>
+#include <rlss_ros/DesiredTrajectory.h>
 
 constexpr unsigned int DIM = DIMENSION;
 
@@ -43,26 +45,33 @@ using DiscretePathSearcher = rlss::DiscretePathSearcher<double, DIM>;
 using ValidityChecker = rlss::ValidityChecker<double, DIM>;
 using GoalSelector = rlss::GoalSelector<double, DIM>;
 
-int self_robot_idx;
-std::map<unsigned int, AlignedBox> other_robot_collision_shapes; // robot_idx -> colshape
+std::string self_robot_namespace; // used as the id of the robot
+std::map<std::string, AlignedBox> other_robot_collision_shapes; // robot_namespace -> colshape
 std::unique_ptr<OccupancyGrid> occupancy_grid_ptr;
-ros::Time desired_trajectory_set_time = ros::Time(0);
+ros::Time desired_trajectory_generation_time = ros::Time(0);
 PiecewiseCurve desired_trajectory;
 StdVectorVectorDIM state;
 unsigned int continuity_upto_degree;
+bool enabled = false;
 
-void otherRobotShapeCallback(const rlss_ros::AABBCollisionShape::ConstPtr& msg) {
+
+bool setOnOffCallback(rlss_ros::SetOnOff::Request& req, rlss_ros::SetOnOff::Response& res) {
+    enabled = req.on;
+    return true;
+}
+
+void robotShapeCallback(const rlss_ros::AABBCollisionShape::ConstPtr& msg) {
     if(msg->bbox.min.size() != DIM) {
         return;
     }
-    unsigned int robot_idx = msg->robot_idx;
-    if(robot_idx != self_robot_idx) {
+    std::string robot_namespace = msg->robot_namespace;
+    if(robot_namespace != self_robot_namespace) {
         VectorDIM shape_min, shape_max;
         for(unsigned int i = 0; i < DIM; i++) {
             shape_min(i) = msg->bbox.min[i];
             shape_max(i) = msg->bbox.max[i];
         }
-        other_robot_collision_shapes[robot_idx] = AlignedBox(shape_min, shape_max);
+        other_robot_collision_shapes[robot_namespace] = AlignedBox(shape_min, shape_max);
     }
 }
 
@@ -78,13 +87,13 @@ void selfStateCallback(const rlss_ros::RobotState::ConstPtr& msg) {
     }
 }
 
-void desiredTrajectoryCallback(const rlss_ros::PiecewiseTrajectory::ConstPtr& msg) {
+bool setDesiredTrajectoryCallback(rlss_ros::DesiredTrajectory::Request& req, rlss_ros::DesiredTrajectory::Response& res) {
     PiecewiseCurve curve;
-    for(std::size_t i = 0; i < msg->pieces.size(); i++) {
-        rlss_ros::Bezier piece_msg = msg->pieces[i];
+    for(std::size_t i = 0; i < req.trajectory.pieces.size(); i++) {
+        rlss_ros::Bezier piece_msg = req.trajectory.pieces[i];
         if(piece_msg.dimension != DIM) {
             ROS_FATAL_STREAM("bez dimension is not correct");
-            return;
+            return false;
         } else {
             Bezier bez(piece_msg.duration);
             for (unsigned int j = 0; j < piece_msg.cpts.size() / DIM; j++) {
@@ -98,7 +107,8 @@ void desiredTrajectoryCallback(const rlss_ros::PiecewiseTrajectory::ConstPtr& ms
         }
     }
     desired_trajectory = curve;
-    desired_trajectory_set_time = ros::Time::now();
+    desired_trajectory_generation_time = req.trajectory.generation_time.data;
+    return true;
 }
 
 void occupancyGridCallback(const rlss_ros::OccupancyGrid::ConstPtr& msg) {
@@ -124,16 +134,16 @@ void occupancyGridCallback(const rlss_ros::OccupancyGrid::ConstPtr& msg) {
 int main(int argc, char **argv) {
     ros::init(argc, argv, "planner");
     ros::NodeHandle nh;
+    ros::NodeHandle pnh("~");
 
-    nh.getParam("robot_idx", self_robot_idx);
+    self_robot_namespace =  ros::this_node::getNamespace();
+
     int c_upto_d;
     nh.getParam("continuity_upto_degree", c_upto_d);
     continuity_upto_degree = c_upto_d;
     state.resize(continuity_upto_degree + 1);
     double replanning_period;
     nh.getParam("replanning_period", replanning_period);
-
-    std::cout << "replanning_period: " << replanning_period << std::endl;
 
     std::vector<int> maximum_derivative_magnitude_degrees;
     std::vector<double> maximum_derivative_magnitude_magnitudes;
@@ -370,13 +380,16 @@ int main(int argc, char **argv) {
     );
 
 
-    ros::Subscriber colshapesub = nh.subscribe("/other_robot_collision_shapes", 1000, otherRobotShapeCallback);
-    ros::Subscriber statesub = nh.subscribe("self_state", 1, selfStateCallback);
-    ros::Subscriber destrajsub = nh.subscribe("desired_trajectory", 1, desiredTrajectoryCallback);
-    ros::Subscriber occgridsub = nh.subscribe("occupancy_grid", 1, occupancyGridCallback);
-    ros::Publisher trajpub = nh.advertise<rlss_ros::PiecewiseTrajectory>("trajectory", 1);
+    ros::Subscriber colshapesub = nh.subscribe("/RobotCollisionShapes", 1000, robotShapeCallback);
+    ros::Subscriber statesub = nh.subscribe("FullCurrentState", 1, selfStateCallback);
+    ros::Subscriber occgridsub = nh.subscribe("OccupancyGrid", 1, occupancyGridCallback);
+    ros::Publisher trajpub = nh.advertise<rlss_ros::PiecewiseTrajectory>("Trajectory", 1);
+    ros::ServiceServer setdestraj = pnh.advertiseService("SetDesiredTrajectory", setDesiredTrajectoryCallback);
+    ros::ServiceServer setonoff = pnh.advertiseService("SetOnOff", setOnOffCallback);
 
     ros::Rate rate(1 / replanning_period);
+    occupancy_grid_ptr = std::make_unique<OccupancyGrid>(VectorDIM(0.5, 0.5, 0.5));
+
 
     while(ros::ok()) {
         ros::spinOnce();
@@ -386,18 +399,19 @@ int main(int argc, char **argv) {
 //            ROS_INFO_STREAM(desired_trajectory_set_time);
 //        }
 
-        if(desired_trajectory_set_time != ros::Time(0)) {
+        if(desired_trajectory_generation_time != ros::Time(0) && enabled) {
             rlss_goal_selector->setOriginalTrajectory(desired_trajectory);
-
+            ROS_INFO_STREAM("lelol");
             std::vector<AlignedBox> other_robot_shapes;
             for (const auto &elem: other_robot_collision_shapes) {
                 other_robot_shapes.push_back(elem.second);
             }
-
+            ROS_INFO_STREAM("here");
             ros::Time current_time = ros::Time::now();
             ros::Duration time_on_trajectory =
-                    current_time - desired_trajectory_set_time;
+                    current_time - desired_trajectory_generation_time;
 
+            ROS_INFO_STREAM("comes");
 //            if(self_robot_idx == 6) {
 //                ROS_INFO_STREAM("before plan");
 //            }
@@ -407,6 +421,7 @@ int main(int argc, char **argv) {
                 other_robot_shapes,
                 *occupancy_grid_ptr
             );
+            ROS_INFO_STREAM("the rain");
 
 //            if(self_robot_idx == 6) {
 //                ROS_INFO_STREAM("after plan");
@@ -434,9 +449,6 @@ int main(int argc, char **argv) {
                 }
                 trajpub.publish(traj_msg);
             } else {
-//                if(self_robot_idx == 6) {
-//                    ROS_INFO_STREAM("no curve");
-//                }
                 ROS_WARN_STREAM("planner failed.");
             }
         } else {

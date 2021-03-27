@@ -13,12 +13,12 @@ find_package(
     catkin REQUIRED COMPONENTS
         roscpp
         message_generation
-        create2_controller
-        nav_msgs
+#        create2_controller
+#        nav_msgs
         std_msgs
         tf
         geometry_msgs
-        crazyflie_driver
+#        crazyflie_driver
 )
 
 find_package(
@@ -72,11 +72,11 @@ add_message_files(
 )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+ add_service_files(
+   FILES
+   DesiredTrajectory.srv
+   SetOnOff.srv
+ )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -153,34 +153,34 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/rlss-ros_node.cpp)
 
-add_executable(
-        figure8
-        src/figure8.cpp
-)
-target_link_libraries(
-        figure8
-        ${catkin_LIBRARIES}
-        rlss
-)
-add_dependencies(
-        figure8
-        ${PROJECT_NAME}_generate_messages_cpp
-)
-
-add_executable(
-        figure8_3d
-        src/figure8_3d.cpp
-)
-target_link_libraries(
-        figure8_3d
-        ${catkin_LIBRARIES}
-        rlss
-)
-add_dependencies(
-        figure8_3d
-        ${PROJECT_NAME}_generate_messages_cpp
-)
-
+#add_executable(
+#        figure8
+#        src/figure8.cpp
+#)
+#target_link_libraries(
+#        figure8
+#        ${catkin_LIBRARIES}
+#        rlss
+#)
+#add_dependencies(
+#        figure8
+#        ${PROJECT_NAME}_generate_messages_cpp
+#)
+#
+#add_executable(
+#        figure8_3d
+#        src/figure8_3d.cpp
+#)
+#target_link_libraries(
+#        figure8_3d
+#        ${catkin_LIBRARIES}
+#        rlss
+#)
+#add_dependencies(
+#        figure8_3d
+#        ${PROJECT_NAME}_generate_messages_cpp
+#)
+#
 add_executable(
         planner_3d
         src/planner.cpp
@@ -198,93 +198,93 @@ add_dependencies(
         planner_3d
         ${PROJECT_NAME}_generate_messages_cpp
 )
+#
+#add_executable(
+#        static_occupancy_grid_feeder_3d
+#        src/static_occupancy_grid_feeder.cpp
+#)
+#target_compile_definitions(
+#        static_occupancy_grid_feeder_3d PUBLIC
+#        DIMENSION=3
+#)
+#target_link_libraries(
+#        static_occupancy_grid_feeder_3d
+#        ${catkin_LIBRARIES}
+#        rlss
+#        ${Boost_LIBRARIES}
+#        ${Boost_FILESYSTEM_LIBRARY}
+#        ${Boost_SYSTEM_LIBRARY}
+#)
+#add_dependencies(
+#        static_occupancy_grid_feeder_3d
+#        ${PROJECT_NAME}_generate_messages_cpp
+#)
+#target_include_directories(
+#        static_occupancy_grid_feeder_3d PUBLIC
+#        ${Boost_INCLUDE_DIRS}
+#)
 
-add_executable(
-        static_occupancy_grid_feeder_3d
-        src/static_occupancy_grid_feeder.cpp
-)
-target_compile_definitions(
-        static_occupancy_grid_feeder_3d PUBLIC
-        DIMENSION=3
-)
-target_link_libraries(
-        static_occupancy_grid_feeder_3d
-        ${catkin_LIBRARIES}
-        rlss
-        ${Boost_LIBRARIES}
-        ${Boost_FILESYSTEM_LIBRARY}
-        ${Boost_SYSTEM_LIBRARY}
-)
-add_dependencies(
-        static_occupancy_grid_feeder_3d
-        ${PROJECT_NAME}_generate_messages_cpp
-)
-target_include_directories(
-        static_occupancy_grid_feeder_3d PUBLIC
-        ${Boost_INCLUDE_DIRS}
-)
-
-
-add_executable(
-        planner_2d
-        src/planner.cpp
-)
-target_compile_definitions(
-        planner_2d PUBLIC
-        DIMENSION=2
-)
-target_link_libraries(
-        planner_2d
-        ${catkin_LIBRARIES}
-        rlss
-)
-add_dependencies(
-        planner_2d
-        ${PROJECT_NAME}_generate_messages_cpp
-)
-add_executable(
-        static_occupancy_grid_feeder_2d
-        src/static_occupancy_grid_feeder.cpp
-)
-target_compile_definitions(
-        static_occupancy_grid_feeder_2d PUBLIC
-        DIMENSION=2
-)
-target_link_libraries(
-        static_occupancy_grid_feeder_2d
-        ${catkin_LIBRARIES}
-        rlss
-        ${Boost_LIBRARIES}
-        ${Boost_FILESYSTEM_LIBRARY}
-        ${Boost_SYSTEM_LIBRARY}
-)
-add_dependencies(
-        static_occupancy_grid_feeder_2d
-        ${PROJECT_NAME}_generate_messages_cpp
-)
-target_include_directories(
-        static_occupancy_grid_feeder_3d PUBLIC
-        ${Boost_INCLUDE_DIRS}
-)
-
-add_executable(
-        commander_2d
-        src/commander.cpp
-)
-target_link_libraries(
-        commander_2d
-        ${catkin_LIBRARIES}
-        rlss
-)
-add_dependencies(
-        commander_2d
-        ${PROJECT_NAME}_generate_messages_cpp
-)
-target_compile_definitions(
-        commander_2d PUBLIC
-        DIMENSION=2
-)
-
+#
+#add_executable(
+#        planner_2d
+#        src/planner.cpp
+#)
+#target_compile_definitions(
+#        planner_2d PUBLIC
+#        DIMENSION=2
+#)
+#target_link_libraries(
+#        planner_2d
+#        ${catkin_LIBRARIES}
+#        rlss
+#)
+#add_dependencies(
+#        planner_2d
+#        ${PROJECT_NAME}_generate_messages_cpp
+#)
+#add_executable(
+#        static_occupancy_grid_feeder_2d
+#        src/static_occupancy_grid_feeder.cpp
+#)
+#target_compile_definitions(
+#        static_occupancy_grid_feeder_2d PUBLIC
+#        DIMENSION=2
+#)
+#target_link_libraries(
+#        static_occupancy_grid_feeder_2d
+#        ${catkin_LIBRARIES}
+#        rlss
+#        ${Boost_LIBRARIES}
+#        ${Boost_FILESYSTEM_LIBRARY}
+#        ${Boost_SYSTEM_LIBRARY}
+#)
+#add_dependencies(
+#        static_occupancy_grid_feeder_2d
+#        ${PROJECT_NAME}_generate_messages_cpp
+#)
+#target_include_directories(
+#        static_occupancy_grid_feeder_3d PUBLIC
+#        ${Boost_INCLUDE_DIRS}
+#)
+#
+#add_executable(
+#        commander_2d
+#        src/commander.cpp
+#)
+#target_link_libraries(
+#        commander_2d
+#        ${catkin_LIBRARIES}
+#        rlss
+#)
+#add_dependencies(
+#        commander_2d
+#        ${PROJECT_NAME}_generate_messages_cpp
+#)
+#target_compile_definitions(
+#        commander_2d PUBLIC
+#        DIMENSION=2
+#)
+#
 add_executable(
         commander_3d
         src/commander.cpp
@@ -302,91 +302,91 @@ target_compile_definitions(
         commander_3d PUBLIC
         DIMENSION=3
 )
-
-add_executable(
-        create2_state_reducer
-        src/create2/state_reducer.cpp
-)
-target_link_libraries(
-        create2_state_reducer
-        ${catkin_LIBRARIES}
-)
-add_dependencies(
-        create2_state_reducer
-        ${PROJECT_NAME}_generate_messages_cpp
-)
-
-add_executable(
-        create2_localizer_2d
-        src/create2/localizer.cpp
-)
-target_link_libraries(
-        create2_localizer_2d
-        ${catkin_LIBRARIES}
-        rlss
-)
-add_dependencies(
-        create2_localizer_2d
-        ${PROJECT_NAME}_generate_messages_cpp
-)
-target_compile_definitions(
-        create2_localizer_2d PUBLIC
-        DIMENSION=2
-)
-
-add_executable(
-        create2_localizer_3d
-        src/create2/localizer.cpp
-)
-target_link_libraries(
-        create2_localizer_3d
-        ${catkin_LIBRARIES}
-        rlss
-)
-add_dependencies(
-        create2_localizer_3d
-        ${PROJECT_NAME}_generate_messages_cpp
-)
-target_compile_definitions(
-        create2_localizer_3d PUBLIC
-        DIMENSION=3
-)
-
-add_executable(
-        static_desired_trajectory_feeder_2d
-        src/static_desired_trajectory_feeder.cpp
-)
-target_link_libraries(
-        static_desired_trajectory_feeder_2d
-        ${catkin_LIBRARIES}
-        rlss
-)
-add_dependencies(
-        static_desired_trajectory_feeder_2d
-        ${PROJECT_NAME}_generate_messages_cpp
-)
-target_compile_definitions(
-        static_desired_trajectory_feeder_2d PUBLIC
-        DIMENSION=2
-)
-
-add_executable(
-        static_desired_trajectory_feeder_3d
-        src/static_desired_trajectory_feeder.cpp
-)
-target_link_libraries(
-        static_desired_trajectory_feeder_3d
-        ${catkin_LIBRARIES}
-        rlss
-)
-add_dependencies(
-        static_desired_trajectory_feeder_3d
-        ${PROJECT_NAME}_generate_messages_cpp
-)
-target_compile_definitions(
-        static_desired_trajectory_feeder_3d PUBLIC
-        DIMENSION=3
-)
+#
+#add_executable(
+#        create2_state_reducer
+#        src/create2/state_reducer.cpp
+#)
+#target_link_libraries(
+#        create2_state_reducer
+#        ${catkin_LIBRARIES}
+#)
+#add_dependencies(
+#        create2_state_reducer
+#        ${PROJECT_NAME}_generate_messages_cpp
+#)
+#
+#add_executable(
+#        create2_localizer_2d
+#        src/create2/localizer.cpp
+#)
+#target_link_libraries(
+#        create2_localizer_2d
+#        ${catkin_LIBRARIES}
+#        rlss
+#)
+#add_dependencies(
+#        create2_localizer_2d
+#        ${PROJECT_NAME}_generate_messages_cpp
+#)
+#target_compile_definitions(
+#        create2_localizer_2d PUBLIC
+#        DIMENSION=2
+#)
+#
+#add_executable(
+#        create2_localizer_3d
+#        src/create2/localizer.cpp
+#)
+#target_link_libraries(
+#        create2_localizer_3d
+#        ${catkin_LIBRARIES}
+#        rlss
+#)
+#add_dependencies(
+#        create2_localizer_3d
+#        ${PROJECT_NAME}_generate_messages_cpp
+#)
+#target_compile_definitions(
+#        create2_localizer_3d PUBLIC
+#        DIMENSION=3
+#)
+#
+#add_executable(
+#        static_desired_trajectory_feeder_2d
+#        src/static_desired_trajectory_feeder.cpp
+#)
+#target_link_libraries(
+#        static_desired_trajectory_feeder_2d
+#        ${catkin_LIBRARIES}
+#        rlss
+#)
+#add_dependencies(
+#        static_desired_trajectory_feeder_2d
+#        ${PROJECT_NAME}_generate_messages_cpp
+#)
+#target_compile_definitions(
+#        static_desired_trajectory_feeder_2d PUBLIC
+#        DIMENSION=2
+#)
+#
+#add_executable(
+#        static_desired_trajectory_feeder_3d
+#        src/static_desired_trajectory_feeder.cpp
+#)
+#target_link_libraries(
+#        static_desired_trajectory_feeder_3d
+#        ${catkin_LIBRARIES}
+#        rlss
+#)
+#add_dependencies(
+#        static_desired_trajectory_feeder_3d
+#        ${PROJECT_NAME}_generate_messages_cpp
+#)
+#target_compile_definitions(
+#        static_desired_trajectory_feeder_3d PUBLIC
+#        DIMENSION=3
+#)
 
 add_executable(
         hector_quadrotor_localizer
@@ -415,33 +415,33 @@ add_dependencies(
         hector_quadrotor_controller
         ${PROJECT_NAME}_generate_message_cpp
 )
-
-add_executable(
-        cf2_state_reducer
-        src/cf2/state_reducer.cpp
-)
-target_link_libraries(
-        cf2_state_reducer
-        ${catkin_LIBRARIES}
-)
-add_dependencies(
-        cf2_state_reducer
-        ${PROJECT_NAME}_generate_messages_cpp
-)
-
-add_executable(
-        cf2_localizer
-        src/cf2/localizer.cpp
-)
-target_link_libraries(
-        cf2_localizer
-        ${catkin_LIBRARIES}
-        rlss
-)
-add_dependencies(
-        cf2_localizer
-        ${PROJECT_NAME}_generate_message_cpp
-)
+#
+#add_executable(
+#        cf2_state_reducer
+#        src/cf2/state_reducer.cpp
+#)
+#target_link_libraries(
+#        cf2_state_reducer
+#        ${catkin_LIBRARIES}
+#)
+#add_dependencies(
+#        cf2_state_reducer
+#        ${PROJECT_NAME}_generate_messages_cpp
+#)
+#
+#add_executable(
+#        cf2_localizer
+#        src/cf2/localizer.cpp
+#)
+#target_link_libraries(
+#        cf2_localizer
+#        ${catkin_LIBRARIES}
+#        rlss
+#)
+#add_dependencies(
+#        cf2_localizer
+#        ${PROJECT_NAME}_generate_message_cpp
+#)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

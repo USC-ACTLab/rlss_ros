@@ -1,5 +1,6 @@
 #include "ros/ros.h"
 #include <rlss_ros/RobotState.h>
+#include <rlss_ros/SetOnOff.h>
 #include <splx/curve/PiecewiseCurve.hpp>
 #include <rlss_ros/PiecewiseTrajectory.h>
 #include <rlss_ros/Bezier.h>
@@ -10,7 +11,13 @@ using PiecewiseCurve = splx::PiecewiseCurve<double, DIM>;
 using Bezier = splx::Bezier<double, DIM>;
 using VectorDIM = Bezier::VectorDIM;
 PiecewiseCurve traj;
-ros::Time last_traj_update_time(0);
+ros::Time trajectory_generation_time(0);
+bool enabled = false;
+
+bool setOnOffCallback(rlss_ros::SetOnOff::Request& req, rlss_ros::SetOnOff::Response& res) {
+    enabled = req.on;
+    return true;
+}
 
 void trajectoryCallback(const rlss_ros::PiecewiseTrajectory::ConstPtr& msg) {
     PiecewiseCurve curve;
@@ -38,17 +45,19 @@ void trajectoryCallback(const rlss_ros::PiecewiseTrajectory::ConstPtr& msg) {
     }
 
     traj = curve;
-    last_traj_update_time = msg->generation_time.data;
-//    last_traj_update_time = ros::Time::now();
+    trajectory_generation_time = msg->generation_time.data;
+    ROS_INFO_STREAM(trajectory_generation_time);
 }
 
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "commander");
     ros::NodeHandle nh;
+    ros::NodeHandle pnh("~");
 
-    ros::Subscriber sub = nh.subscribe("trajectory", 1, trajectoryCallback);
-    ros::Publisher pub = nh.advertise<rlss_ros::RobotState>("full_desired_state", 1);
+    ros::Subscriber sub = nh.subscribe("Trajectory", 1, trajectoryCallback);
+    ros::Publisher pub = nh.advertise<rlss_ros::RobotState>("FullDesiredState", 1);
+    ros::ServiceServer setonoffserv = pnh.advertiseService("SetOnOff", setOnOffCallback);
 
     double dt;
     nh.getParam("commander_dt", dt);
@@ -60,13 +69,14 @@ int main(int argc, char** argv) {
     ros::Rate rate(1/dt);
     while(ros::ok()) {
         ros::spinOnce();
-        if(last_traj_update_time != ros::Time(0)) {
+        if(trajectory_generation_time != ros::Time(0) && enabled) {
             ros::Time current_time = ros::Time::now();
+            ROS_INFO_STREAM(current_time);
             rlss_ros::RobotState msg;
             msg.dimension = DIM;
 
             for(unsigned int i = 0; i <= continuity_upto_degree; i++) {
-                VectorDIM vec = traj.eval(std::min((current_time - last_traj_update_time).toSec() + 2 * dt, traj.maxParameter()), i);
+                VectorDIM vec = traj.eval(std::min((current_time - trajectory_generation_time).toSec() + 2 * dt, traj.maxParameter()), i);
                 for(unsigned int d = 0; d < DIM; d++) {
                     msg.vars.push_back(vec(d));
                 }
