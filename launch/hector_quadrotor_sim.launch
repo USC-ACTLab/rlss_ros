@@ -88,7 +88,7 @@
     <arg name="x_pos" default="0.0"/>
     <arg name="y_pos" default="0.0"/>
     <arg name="z_pos" default="0.0"/>
-    <include file="$(find rlss_ros)/launch/spawn_quadrotor_rlss.launch">
+    <include file="$(find rlss_ros)/launch/hector_quadrotor_spawn.launch">
         <arg name="ns" value="$(arg ns)"/>
         <arg name="x" value="$(arg x_pos)"/>
         <arg name="y" value="$(arg y_pos)"/>
