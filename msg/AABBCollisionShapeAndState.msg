@@ -1,0 +1,3 @@
+string robot_namespace
+AABB bbox
+RobotState state

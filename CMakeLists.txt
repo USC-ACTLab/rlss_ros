@@ -18,6 +18,9 @@ find_package(
         std_msgs
         tf
         geometry_msgs
+        genmsg
+        actionlib_msgs
+        actionlib
 #        crazyflie_driver
 )
 
@@ -66,8 +69,8 @@ add_message_files(
     Bezier.msg
     PiecewiseTrajectory.msg
     AABB.msg
-    AABBCollisionShape.msg
     RobotState.msg
+    AABBCollisionShapeAndState.msg
     OccupancyGrid.msg
 )
 
@@ -79,16 +82,18 @@ add_message_files(
  )
 
 ## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
+ add_action_files(
+   DIRECTORY
+   action
+   FILES
+   FollowTrajectory.action
+ )
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
     DEPENDENCIES
     std_msgs  # Or other packages containing msgs
+    actionlib_msgs
 )
 
 ################################################
@@ -182,21 +187,39 @@ include_directories(
 #)
 #
 add_executable(
-        planner_3d
-        src/planner.cpp
+        replanner_3d
+        src/replanner.cpp
 )
 target_compile_definitions(
-        planner_3d PUBLIC
+        replanner_3d PUBLIC
         DIMENSION=3
 )
 target_link_libraries(
-        planner_3d
+        replanner_3d
         ${catkin_LIBRARIES}
         rlss
 )
 add_dependencies(
-        planner_3d
+        replanner_3d
         ${PROJECT_NAME}_generate_messages_cpp
+)
+
+add_executable(
+        follow_trajectory_action_server_3d
+        src/follow_trajectory_action_server.cpp
+)
+target_compile_definitions(
+        follow_trajectory_action_server_3d PUBLIC
+        DIMENSION=3
+)
+target_link_libraries(
+        follow_trajectory_action_server_3d
+        ${catkin_LIBRARIES}
+        rlss
+)
+add_dependencies(
+        follow_trajectory_action_server_3d
+        ${rlss_ros_EXPORTED_TARGETS}
 )
 #
 #add_executable(

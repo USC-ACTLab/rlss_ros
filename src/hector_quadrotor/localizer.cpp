@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <rlss_ros/RobotState.h>
-#include <rlss_ros/AABBCollisionShape.h>
+#include <rlss_ros/AABBCollisionShapeAndState.h>
 #include <rlss/CollisionShapes/AlignedBoxCollisionShape.hpp>
 #include <rlss/internal/Util.hpp>
 #include <tf/transform_listener.h>
@@ -34,7 +34,8 @@ void publish() {
 
     AlignedBox current_cs = shape->boundingBox(state[0]);
 
-    rlss_ros::AABBCollisionShape cs_msg;
+    rlss_ros::AABBCollisionShapeAndState cs_msg;
+    cs_msg.state = msg;
     cs_msg.robot_namespace = self_robot_namespace;
     for(unsigned int i = 0; i < DIM; i++) {
         cs_msg.bbox.min.push_back(current_cs.min()(i));
@@ -92,7 +93,7 @@ int main(int argc, char* argv[]) {
     shape = std::make_shared<AABBCollisionShape>(colshape_at_zero);
 
     self_state_publisher = nh.advertise<rlss_ros::RobotState>("FullCurrentState", 1);
-    collision_shape_publisher = nh.advertise<rlss_ros::AABBCollisionShape>("/RobotCollisionShapes", 1);
+    collision_shape_publisher = nh.advertise<rlss_ros::AABBCollisionShapeAndState>("/RobotCollisionShapesAndStates", 1);
 
     ros::Subscriber fdssub = nh.subscribe("FullDesiredState", 1, fullDesiredStateCallback);
 

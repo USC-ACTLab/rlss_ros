@@ -11,7 +11,7 @@
     <arg name="maximum_derivative_magnitude_degrees" default="[1, 2]"/>
     <arg name="maximum_derivative_magnitude_magnitudes" default="[2, 4]"/>
     <arg name="workspace_min" default="[-50, -50, -1.5]"/>
-    <arg name="workspace_max" default="[50, 50, 10]"/>
+    <arg name="workspace_max" default="[50, 50, 50]"/>
     <arg name="collision_shape_at_zero_min" default="[-1, -1, -1]"/>
     <arg name="collision_shape_at_zero_max" default="[1, 1, 1]"/>
     <arg name="soft_optimization_parameters/robot_to_robot_hyperplane_constraints_enabled" default="true"/>
@@ -23,7 +23,7 @@
     <arg name="soft_optimization_parameters/initial_point_constraints_value" default="100000"/>
     <arg name="soft_optimization_parameters/continuity_constraints_value" default="1000"/>
     <arg name="optimization_obstacle_check_distance" default="0.5"/>
-    <arg name="optimizer" default="rlss-hard"/>
+    <arg name="optimizer" default="rlss-hard-soft"/>
     <arg name="piece_endpoint_cost_weights" default="[4, 8, 16, 32]"/>
     <arg name="integrated_squared_derivative_weight_degrees" default="[1, 2]"/>
     <arg name="integrated_squared_derivative_weight_weights" default="[1.0, 0.8]"/>
@@ -31,7 +31,7 @@
     <arg name="max_rescaling_count" default="6"/>
     <arg name="rescaling_multiplier" default="1.2"/>
     <arg name="search_step" default="0.01"/>
-    <arg name="num_bezier_control_points" default="[8, 8, 8, 8]"/>
+    <arg name="num_bezier_control_points" default="[7, 7, 7, 7]"/>
     <arg name="reference_frame" default="world"/>
     <arg name="robot_frame" default="$(arg ns)/base_link"/>
 
@@ -75,7 +75,8 @@
     <rosparam param="reference_frame" subst_value="True">$(arg reference_frame)</rosparam>
     <rosparam param="robot_frame" subst_value="True">$(arg robot_frame)</rosparam>
 
-    <node pkg="rlss_ros" name="planner" type="planner_3d" required="true" output="screen"/>
+    <node pkg="rlss_ros" name="follow_trajectory_server" type="follow_trajectory_action_server_3d" required="true" output="screen"/>
+    <node pkg="rlss_ros" name="replanner" type="replanner_3d" required="true" output="screen"/>
     <node pkg="rlss_ros" name="commander" type="commander_3d" required="true" output="screen"/>
     <node pkg="rlss_ros" name="localizer" type="hector_quadrotor_localizer" required="true" output="screen"/>
     <node pkg="rlss_ros" name="controller" type="hector_quadrotor_controller" required="true" output="screen">
