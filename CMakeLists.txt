@@ -87,6 +87,9 @@ add_message_files(
    action
    FILES
    FollowTrajectory.action
+   Land.action
+   Takeoff.action
+   NAV.action
  )
 
 ## Generate added messages and services with any dependencies listed here
@@ -219,6 +222,63 @@ target_link_libraries(
 )
 add_dependencies(
         follow_trajectory_action_server_3d
+        ${rlss_ros_EXPORTED_TARGETS}
+)
+
+
+add_executable(
+        land_action_server_3d
+        src/land_action_server.cpp
+)
+target_compile_definitions(
+        land_action_server_3d PUBLIC
+        DIMENSION=3
+)
+target_link_libraries(
+        land_action_server_3d
+        ${catkin_LIBRARIES}
+        rlss
+)
+add_dependencies(
+        land_action_server_3d
+        ${rlss_ros_EXPORTED_TARGETS}
+)
+
+
+add_executable(
+        takeoff_action_server_3d
+        src/takeoff_action_server.cpp
+)
+target_compile_definitions(
+        takeoff_action_server_3d PUBLIC
+        DIMENSION=3
+)
+target_link_libraries(
+        takeoff_action_server_3d
+        ${catkin_LIBRARIES}
+        rlss
+)
+add_dependencies(
+        takeoff_action_server_3d
+        ${rlss_ros_EXPORTED_TARGETS}
+)
+
+
+add_executable(
+        nav_action_server_3d
+        src/nav_action_server.cpp
+)
+target_compile_definitions(
+        nav_action_server_3d PUBLIC
+        DIMENSION=3
+)
+target_link_libraries(
+        nav_action_server_3d
+        ${catkin_LIBRARIES}
+        rlss
+)
+add_dependencies(
+        nav_action_server_3d
         ${rlss_ros_EXPORTED_TARGETS}
 )
 #

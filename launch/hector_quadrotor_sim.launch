@@ -9,11 +9,11 @@
     <arg name="continuity_upto_degree" default="2"/> <!-- used in commander as well -->
     <arg name="replanning_period" default="0.1"/>
     <arg name="maximum_derivative_magnitude_degrees" default="[1, 2]"/>
-    <arg name="maximum_derivative_magnitude_magnitudes" default="[2, 4]"/>
+    <arg name="maximum_derivative_magnitude_magnitudes" default="[3, 6]"/>
     <arg name="workspace_min" default="[-50, -50, -1.5]"/>
     <arg name="workspace_max" default="[50, 50, 50]"/>
-    <arg name="collision_shape_at_zero_min" default="[-1, -1, -1]"/>
-    <arg name="collision_shape_at_zero_max" default="[1, 1, 1]"/>
+    <arg name="collision_shape_at_zero_min" default="[-0.4, -0.4, -0.15]"/>
+    <arg name="collision_shape_at_zero_max" default="[0.4, 0.4, 0.15]"/>
     <arg name="soft_optimization_parameters/robot_to_robot_hyperplane_constraints_enabled" default="true"/>
     <arg name="soft_optimization_parameters/robot_to_obstacle_hyperplane_constraints_enabled" default="true"/>
     <arg name="soft_optimization_parameters/initial_point_constraints_enabled" default="true"/>
@@ -45,6 +45,7 @@
     <arg name="kdp" default="2"/>
     <arg name="kdv" default="0"/>
 
+
     <rosparam param="continuity_upto_degree" subst_value="True">$(arg continuity_upto_degree)</rosparam>
     <rosparam param="replanning_period" subst_value="True">$(arg replanning_period)</rosparam>
     <rosparam param="maximum_derivative_magnitude_degrees" subst_value="True">$(arg maximum_derivative_magnitude_degrees)</rosparam>
@@ -75,6 +76,10 @@
     <rosparam param="reference_frame" subst_value="True">$(arg reference_frame)</rosparam>
     <rosparam param="robot_frame" subst_value="True">$(arg robot_frame)</rosparam>
 
+
+    <node pkg="rlss_ros" name="nav_server" type="nav_action_server_3d" required="true" output="screen"/>
+    <node pkg="rlss_ros" name="takeoff_server" type="takeoff_action_server_3d" required="true" output="screen"/>
+    <node pkg="rlss_ros" name="land_server" type="land_action_server_3d" required="true" output="screen"/>
     <node pkg="rlss_ros" name="follow_trajectory_server" type="follow_trajectory_action_server_3d" required="true" output="screen"/>
     <node pkg="rlss_ros" name="replanner" type="replanner_3d" required="true" output="screen"/>
     <node pkg="rlss_ros" name="commander" type="commander_3d" required="true" output="screen"/>

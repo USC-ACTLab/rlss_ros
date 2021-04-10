@@ -69,7 +69,7 @@ void execute(const rlss_ros::FollowTrajectoryGoalConstPtr& goal, Server* as) {
 
     rlss_ros::FollowTrajectoryFeedback feedback;
 
-    bool success = false;
+    bool preempted = false;
     StdDequeVectorDIM position_queue;
     double total_distance = 0;
 
@@ -86,11 +86,11 @@ void execute(const rlss_ros::FollowTrajectoryGoalConstPtr& goal, Server* as) {
 
 
         if(as->isPreemptRequested()) {
-            success = false;
+            preempted = true;
             break;
         } else {
             if((target_position - state[0]).norm() < 0.1) {
-                success = true;
+                preempted = false;
                 break;
             } else if(state[0](0) < 0.05) {
                 feedback.current_state = feedback.CRASHED;
@@ -122,9 +122,12 @@ void execute(const rlss_ros::FollowTrajectoryGoalConstPtr& goal, Server* as) {
 
     FullDesiredStatePublisher.publish(desired_state);
 
-    rlss_ros::FollowTrajectoryResult result;
-    result.followed = success;
-    as->setSucceeded(result);
+    if(!preempted) {
+        rlss_ros::FollowTrajectoryResult result;
+        as->setSucceeded(result);
+    } else {
+        as->setPreempted();
+    }
 }
 
 void selfStateCallback(const rlss_ros::RobotState::ConstPtr& msg) {

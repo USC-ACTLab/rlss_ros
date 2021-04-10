@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
     std::string reference_frame;
     nh.getParam("reference_frame", reference_frame);
     std::string robot_frame;
-    nh.getParam("base_link_frame", robot_frame);
+    nh.getParam("robot_frame", robot_frame);
 
     std::cout << "reference_frame: " << reference_frame << ", robot_frame: " << robot_frame << std::endl;
 
@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
             ori = transform.getRotation();
 
             VectorDIM pos_error = desired_state[0] - current_state[0];
-            VectorDIM input = desired_state[1] + kpp * pos_error;
+            VectorDIM input = /*desired_state[1] +*/ kpp * pos_error;
 
             if(prev_pos_time != ros::Time(0)) {
                 input += kdp * (pos_error - prev_pos_error);
@@ -116,6 +116,8 @@ int main(int argc, char* argv[]) {
                 prev_vel_error = vel_error;
                 prev_vel_time = ros::Time::now();
             }
+
+            input = 2 * (input / (std::max(input.norm(), 2.0)));
 
             prev_pos_error = pos_error;
             prev_pos = current_state[0];

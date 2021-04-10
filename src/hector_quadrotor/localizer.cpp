@@ -14,6 +14,7 @@ using AlignedBox = rlss::internal::AlignedBox<double, DIM>;
 
 std::string self_robot_namespace;
 StdVectorVectorDIM state;
+std::vector<ros::Time> last_update_time;
 unsigned int continuity_upto_degree;
 std::shared_ptr<AABBCollisionShape> shape;
 
@@ -71,7 +72,7 @@ int main(int argc, char* argv[]) {
     nh.getParam("continuity_upto_degree", c_u_d);
     continuity_upto_degree = c_u_d;
     state.resize(continuity_upto_degree + 1, VectorDIM::Zero());
-
+    last_update_time.resize(continuity_upto_degree + 1, ros::Time(0));
 
     std::vector<double> colshape_min_vec, colshape_max_vec;
     nh.getParam("collision_shape_at_zero_min", colshape_min_vec);
@@ -114,9 +115,34 @@ int main(int argc, char* argv[]) {
             tf::StampedTransform transform;
             listener.lookupTransform(reference_frame, robot_frame, ros::Time(0),
                                      transform);
+
+            StdVectorVectorDIM prev_state = state;
             state[0](0) = transform.getOrigin().x();
             state[0](1) = transform.getOrigin().y();
             state[0](2) = transform.getOrigin().z();
+
+            if(state[0] != prev_state[0]) {
+
+                auto now = ros::Time::now();
+
+                for (unsigned int i = 1; i <= continuity_upto_degree; i++) {
+                    if (last_update_time[i - 1] != ros::Time(0)) {
+                        state[i] = (state[i - 1] - prev_state[i - 1]) /
+                                   (now - last_update_time[i - 1]).toSec();
+                    } else {
+                        break;
+                    }
+                }
+                unsigned int i = 0;
+                for (; i <= continuity_upto_degree; i++) {
+                    if (last_update_time[i] != ros::Time(0)) {
+                        last_update_time[i] = now;
+                    } else {
+                        break;
+                    }
+                }
+                if (i <= continuity_upto_degree) last_update_time[i] = now;
+            }
         } catch(...) {
             ROS_WARN_STREAM("tf err");
         }
