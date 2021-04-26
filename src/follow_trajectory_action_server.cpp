@@ -24,6 +24,7 @@ ros::ServiceClient ReplannerSetDesiredTrajectoryClient;
 ros::Publisher FullDesiredStatePublisher;
 StdVectorVectorDIM state;
 unsigned int continuity_upto_degree;
+bool with_controller;
 
 void execute(const rlss_ros::FollowTrajectoryGoalConstPtr& goal, Server* as) {
     PiecewiseCurve curve;
@@ -62,7 +63,8 @@ void execute(const rlss_ros::FollowTrajectoryGoalConstPtr& goal, Server* as) {
     ReplannerSetDesiredTrajectoryClient.call(desired_trajectory);
     ReplannerOnOffClient.call(set_on_off);
     CommanderOnOffClient.call(set_on_off);
-    ControllerOnOffClient.call(set_on_off);
+    if(with_controller)
+        ControllerOnOffClient.call(set_on_off);
 
 
     ros::Rate rate(2);
@@ -89,7 +91,7 @@ void execute(const rlss_ros::FollowTrajectoryGoalConstPtr& goal, Server* as) {
             preempted = true;
             break;
         } else {
-            if((target_position - state[0]).norm() < 0.1) {
+            if((target_position - state[0]).norm() < 0.2) {
                 preempted = false;
                 break;
             } else if(state[0](0) < 0.05) {
@@ -151,6 +153,8 @@ int main(int argc, char** argv) {
     continuity_upto_degree = c_upto_d;
     state.resize(continuity_upto_degree + 1);
 
+    nh.getParam("with_controller", with_controller);
+
     ros::service::waitForService("replanner/SetOnOff");
     ReplannerOnOffClient = nh.serviceClient<rlss_ros::SetOnOff>("replanner/SetOnOff", true);
     if(!ReplannerOnOffClient) {
@@ -167,11 +171,13 @@ int main(int argc, char** argv) {
     }
 
 
-    ros::service::waitForService("controller/SetOnOff");
-    ControllerOnOffClient = nh.serviceClient<rlss_ros::SetOnOff>("controller/SetOnOff", true);
-    if(!ControllerOnOffClient) {
-        ROS_ERROR_STREAM("ControllerOnOffClient not connected");
-        return 0;
+    if(with_controller) {
+        ros::service::waitForService("controller/SetOnOff");
+        ControllerOnOffClient = nh.serviceClient<rlss_ros::SetOnOff>("controller/SetOnOff", true);
+        if(!ControllerOnOffClient) {
+            ROS_ERROR_STREAM("ControllerOnOffClient not connected");
+            return 0;
+        }
     }
 
 

@@ -5,7 +5,7 @@
 #include <rlss/internal/Util.hpp>
 #include <tf/transform_listener.h>
 
-constexpr unsigned int DIM = 3U;
+constexpr unsigned int DIM = DIMENSION;
 
 using VectorDIM = rlss::internal::VectorDIM<double, DIM>;
 using StdVectorVectorDIM = rlss::internal::StdVectorVectorDIM<double, DIM>;

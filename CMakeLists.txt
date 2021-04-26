@@ -472,19 +472,22 @@ target_compile_definitions(
 #)
 
 add_executable(
-        hector_quadrotor_localizer
-        src/hector_quadrotor/localizer.cpp
+        tf_localizer_3d
+        src/tf_localizer.cpp
 )
 target_link_libraries(
-        hector_quadrotor_localizer
+        tf_localizer_3d
         ${catkin_LIBRARIES}
         rlss
 )
 add_dependencies(
-        hector_quadrotor_localizer
+        tf_localizer_3d
         ${PROJECT_NAME}_generate_message_cpp
 )
-
+target_compile_definitions(
+        tf_localizer_3d PUBLIC
+        DIMENSION=3
+)
 add_executable(
         hector_quadrotor_controller
         src/hector_quadrotor/controller.cpp
@@ -498,6 +501,20 @@ add_dependencies(
         hector_quadrotor_controller
         ${PROJECT_NAME}_generate_message_cpp
 )
+
+add_executable(
+        cf_desired_state_reducer
+        src/cf/state_reducer.cpp
+)
+target_link_libraries(
+        cf_desired_state_reducer
+        ${catkin_LIBRARIES}
+)
+add_dependencies(
+        cf_desired_state_reducer
+        ${PROJECT_NAME}_generate_messages_cpp
+)
+
 #
 #add_executable(
 #        cf2_state_reducer

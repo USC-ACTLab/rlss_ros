@@ -25,12 +25,13 @@ std::unique_ptr<Client> client;
 StdVectorVectorDIM state;
 unsigned int continuity_upto_degree;
 double max_velocity = std::numeric_limits<double>::infinity();
+bool with_controller;
 
 void execute(const rlss_ros::TakeoffGoalConstPtr& goal, Server* as) {
 
     rlss_ros::Bezier bez;
     bez.dimension = DIM;
-    bez.duration = std::abs(state[0](2) - goal->takeoff_height) / max_velocity;
+    bez.duration = std::abs(state[0](2) - goal->takeoff_height) / (max_velocity/5);
     for(unsigned int d = 0; d < DIM; d++) {
         bez.cpts.push_back(state[0](d));
     }
@@ -109,6 +110,8 @@ int main(int argc, char** argv) {
     continuity_upto_degree = c_upto_d;
     state.resize(continuity_upto_degree + 1);
 
+    nh.getParam("with_controller", with_controller);
+
     std::vector<int> degrees;
     nh.getParam("maximum_derivative_magnitude_degrees", degrees);
     std::vector<double> max_derivatives;
@@ -120,11 +123,13 @@ int main(int argc, char** argv) {
         }
     }
 
-    ros::service::waitForService("controller/SetOnOff");
-    ControllerOnOffClient = nh.serviceClient<rlss_ros::SetOnOff>("controller/SetOnOff", true);
-    if(!ControllerOnOffClient) {
-        ROS_ERROR_STREAM("ControllerOnOffClient not connected");
-        return 0;
+    if(with_controller) {
+        ros::service::waitForService("controller/SetOnOff");
+        ControllerOnOffClient = nh.serviceClient<rlss_ros::SetOnOff>("controller/SetOnOff", true);
+        if(!ControllerOnOffClient) {
+            ROS_ERROR_STREAM("ControllerOnOffClient not connected");
+            return 0;
+        }
     }
 
     client = std::make_unique<Client>("FollowTrajectory", true);

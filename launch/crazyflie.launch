@@ -3,17 +3,17 @@
     <arg name="ns" default=""/>
 
     <!-- COMMANDER PARAMETERS -->
-    <arg name="commander_dt" default="0.05"/>
+    <arg name="commander_dt" default="0.01"/>
 
     <!-- PLANNER PARAMETERS -->
-    <arg name="continuity_upto_degree" default="2"/> <!-- used in commander as well -->
-    <arg name="replanning_period" default="0.1"/>
+    <arg name="continuity_upto_degree" default="1"/> <!-- used in commander as well -->
+    <arg name="replanning_period" default="0.5"/>
     <arg name="maximum_derivative_magnitude_degrees" default="[1, 2]"/>
-    <arg name="maximum_derivative_magnitude_magnitudes" default="[3, 6]"/>
+    <arg name="maximum_derivative_magnitude_magnitudes" default="[2, 3]"/>
     <arg name="workspace_min" default="[-50, -50, -1.5]"/>
     <arg name="workspace_max" default="[50, 50, 50]"/>
-    <arg name="collision_shape_at_zero_min" default="[-0.4, -0.4, -0.15]"/>
-    <arg name="collision_shape_at_zero_max" default="[0.4, 0.4, 0.15]"/>
+    <arg name="collision_shape_at_zero_min" default="[-0.1, -0.1, -0.15]"/>
+    <arg name="collision_shape_at_zero_max" default="[0.1, 0.1, 0.15]"/>
     <arg name="soft_optimization_parameters/robot_to_robot_hyperplane_constraints_enabled" default="true"/>
     <arg name="soft_optimization_parameters/robot_to_obstacle_hyperplane_constraints_enabled" default="true"/>
     <arg name="soft_optimization_parameters/initial_point_constraints_enabled" default="true"/>
@@ -24,26 +24,16 @@
     <arg name="soft_optimization_parameters/continuity_constraints_value" default="1000"/>
     <arg name="optimization_obstacle_check_distance" default="0.5"/>
     <arg name="optimizer" default="rlss-hard-soft"/>
-    <arg name="piece_endpoint_cost_weights" default="[4, 8, 16, 32]"/>
-    <arg name="integrated_squared_derivative_weight_degrees" default="[1, 2]"/>
-    <arg name="integrated_squared_derivative_weight_weights" default="[1.0, 0.8]"/>
+    <arg name="piece_endpoint_cost_weights" default="[4, 32]"/>
+    <arg name="integrated_squared_derivative_weight_degrees" default="[1, 2, 4]"/>
+    <arg name="integrated_squared_derivative_weight_weights" default="[1.0, 0.8, 3.0]"/>
     <arg name="desired_time_horizon" default="5.0"/>
     <arg name="max_rescaling_count" default="6"/>
     <arg name="rescaling_multiplier" default="1.2"/>
     <arg name="search_step" default="0.01"/>
-    <arg name="num_bezier_control_points" default="[7, 7, 7, 7]"/>
+    <arg name="num_bezier_control_points" default="[7, 7]"/>
     <arg name="reference_frame" default="world"/>
-    <arg name="robot_frame" default="$(arg ns)/base_link"/>
-
-    <!-- CONTROLLER PARAMETERS -->
-<!--    <arg name="tf_prefix" default=""/>-->
-<!--    <arg name="tf_prefix" default="$(optenv ROS_NAMESPACE)"/>-->
-<!--    <arg name="world_frame" default="world"/>-->
-<!--    <arg name="robot_frame" default="$(arg tf_prefix)/base_link"/>-->
-    <arg name="kpp" default="5.5"/>
-    <arg name="kpv" default="0"/>
-    <arg name="kdp" default="2"/>
-    <arg name="kdv" default="0"/>
+    <arg name="robot_frame" default="$(arg ns)"/>
 
 
     <rosparam param="continuity_upto_degree" subst_value="True">$(arg continuity_upto_degree)</rosparam>
@@ -77,7 +67,7 @@
     <rosparam param="robot_frame" subst_value="True">$(arg robot_frame)</rosparam>
 
 
-    <param name="with_controller" value="true"/>
+    <param name="with_controller" value="false"/>
     <node pkg="rlss_ros" name="nav_server" type="nav_action_server_3d" required="true" output="screen"/>
     <node pkg="rlss_ros" name="takeoff_server" type="takeoff_action_server_3d" required="true" output="screen"/>
     <node pkg="rlss_ros" name="land_server" type="land_action_server_3d" required="true" output="screen"/>
@@ -85,24 +75,6 @@
     <node pkg="rlss_ros" name="replanner" type="replanner_3d" required="true" output="screen"/>
     <node pkg="rlss_ros" name="commander" type="commander_3d" required="true" output="screen"/>
     <node pkg="rlss_ros" name="localizer" type="tf_localizer_3d" required="true" output="screen"/>
-    <node pkg="rlss_ros" name="controller" type="hector_quadrotor_controller" required="true" output="screen">
-        <param name="kpp" value="$(arg kpp)"/>
-        <param name="kpv" value="$(arg kpv)"/>
-        <param name="kdp" value="$(arg kdp)"/>
-        <param name="kdv" value="$(arg kdv)"/>
-    </node>
-
-    <arg name="x_pos" default="0.0"/>
-    <arg name="y_pos" default="0.0"/>
-    <arg name="z_pos" default="0.0"/>
-    <include file="$(find rlss_ros)/launch/hector_quadrotor_spawn.launch">
-        <arg name="ns" value="$(arg ns)"/>
-        <arg name="x" value="$(arg x_pos)"/>
-        <arg name="y" value="$(arg y_pos)"/>
-        <arg name="z" value="$(arg z_pos)"/>
-    </include>
-
-    <node pkg="rosservice" type="rosservice" name="enable_motors" args='call --wait enable_motors "enable: true"'>
-    </node>
+    <node pkg="rlss_ros" name="cf_desired_state_reducer" type="cf_desired_state_reducer" required="true" output="screen"/>
 
 </launch>
