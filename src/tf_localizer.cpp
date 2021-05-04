@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
     self_state_publisher = nh.advertise<rlss_ros::RobotState>("FullCurrentState", 1);
     collision_shape_publisher = nh.advertise<rlss_ros::AABBCollisionShapeAndState>("/RobotCollisionShapesAndStates", 1);
 
-    ros::Subscriber fdssub = nh.subscribe("FullDesiredState", 1, fullDesiredStateCallback);
+    // ros::Subscriber fdssub = nh.subscribe("FullDesiredState", 1, fullDesiredStateCallback);
 
     std::string reference_frame;
     nh.getParam("reference_frame", reference_frame);

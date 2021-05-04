@@ -3,7 +3,7 @@
     <arg name="ns" default=""/>
 
     <!-- COMMANDER PARAMETERS -->
-    <arg name="commander_dt" default="0.05"/>
+    <arg name="commander_dt" default="0.1"/>
 
     <!-- PLANNER PARAMETERS -->
     <arg name="continuity_upto_degree" default="2"/> <!-- used in commander as well -->

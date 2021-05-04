@@ -3,17 +3,17 @@
     <arg name="ns" default=""/>
 
     <!-- COMMANDER PARAMETERS -->
-    <arg name="commander_dt" default="0.01"/>
+    <arg name="commander_dt" default="0.02"/>
 
     <!-- PLANNER PARAMETERS -->
-    <arg name="continuity_upto_degree" default="1"/> <!-- used in commander as well -->
-    <arg name="replanning_period" default="0.5"/>
+    <arg name="continuity_upto_degree" default="2"/> <!-- used in commander as well -->
+    <arg name="replanning_period" default="0.1"/>
     <arg name="maximum_derivative_magnitude_degrees" default="[1, 2]"/>
-    <arg name="maximum_derivative_magnitude_magnitudes" default="[2, 3]"/>
+    <arg name="maximum_derivative_magnitude_magnitudes" default="[3, 6]"/>
     <arg name="workspace_min" default="[-50, -50, -1.5]"/>
     <arg name="workspace_max" default="[50, 50, 50]"/>
-    <arg name="collision_shape_at_zero_min" default="[-0.1, -0.1, -0.15]"/>
-    <arg name="collision_shape_at_zero_max" default="[0.1, 0.1, 0.15]"/>
+    <arg name="collision_shape_at_zero_min" default="[-0.2, -0.2, -0.15]"/>
+    <arg name="collision_shape_at_zero_max" default="[0.2, 0.2, 0.15]"/>
     <arg name="soft_optimization_parameters/robot_to_robot_hyperplane_constraints_enabled" default="true"/>
     <arg name="soft_optimization_parameters/robot_to_obstacle_hyperplane_constraints_enabled" default="true"/>
     <arg name="soft_optimization_parameters/initial_point_constraints_enabled" default="true"/>
@@ -24,14 +24,14 @@
     <arg name="soft_optimization_parameters/continuity_constraints_value" default="1000"/>
     <arg name="optimization_obstacle_check_distance" default="0.5"/>
     <arg name="optimizer" default="rlss-hard-soft"/>
-    <arg name="piece_endpoint_cost_weights" default="[4, 32]"/>
-    <arg name="integrated_squared_derivative_weight_degrees" default="[1, 2, 4]"/>
-    <arg name="integrated_squared_derivative_weight_weights" default="[1.0, 0.8, 3.0]"/>
+    <arg name="piece_endpoint_cost_weights" default="[4, 8, 32]"/>
+    <arg name="integrated_squared_derivative_weight_degrees" default="[1, 2]"/>
+    <arg name="integrated_squared_derivative_weight_weights" default="[1.0, 0.8]"/>
     <arg name="desired_time_horizon" default="5.0"/>
     <arg name="max_rescaling_count" default="6"/>
     <arg name="rescaling_multiplier" default="1.2"/>
     <arg name="search_step" default="0.01"/>
-    <arg name="num_bezier_control_points" default="[7, 7]"/>
+    <arg name="num_bezier_control_points" default="[7, 7, 7]"/>
     <arg name="reference_frame" default="world"/>
     <arg name="robot_frame" default="$(arg ns)"/>
 
