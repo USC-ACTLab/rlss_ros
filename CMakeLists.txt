@@ -281,31 +281,31 @@ add_dependencies(
         nav_action_server_3d
         ${rlss_ros_EXPORTED_TARGETS}
 )
-#
-#add_executable(
-#        static_occupancy_grid_feeder_3d
-#        src/static_occupancy_grid_feeder.cpp
-#)
-#target_compile_definitions(
-#        static_occupancy_grid_feeder_3d PUBLIC
-#        DIMENSION=3
-#)
-#target_link_libraries(
-#        static_occupancy_grid_feeder_3d
-#        ${catkin_LIBRARIES}
-#        rlss
-#        ${Boost_LIBRARIES}
-#        ${Boost_FILESYSTEM_LIBRARY}
-#        ${Boost_SYSTEM_LIBRARY}
-#)
-#add_dependencies(
-#        static_occupancy_grid_feeder_3d
-#        ${PROJECT_NAME}_generate_messages_cpp
-#)
-#target_include_directories(
-#        static_occupancy_grid_feeder_3d PUBLIC
-#        ${Boost_INCLUDE_DIRS}
-#)
+
+add_executable(
+       static_occupancy_grid_feeder_3d
+       src/static_occupancy_grid_feeder.cpp
+)
+target_compile_definitions(
+       static_occupancy_grid_feeder_3d PUBLIC
+       DIMENSION=3
+)
+target_link_libraries(
+       static_occupancy_grid_feeder_3d
+       ${catkin_LIBRARIES}
+       rlss
+       ${Boost_LIBRARIES}
+       ${Boost_FILESYSTEM_LIBRARY}
+       ${Boost_SYSTEM_LIBRARY}
+)
+add_dependencies(
+       static_occupancy_grid_feeder_3d
+       ${PROJECT_NAME}_generate_messages_cpp
+)
+target_include_directories(
+       static_occupancy_grid_feeder_3d PUBLIC
+       ${Boost_INCLUDE_DIRS}
+)
 
 #
 #add_executable(

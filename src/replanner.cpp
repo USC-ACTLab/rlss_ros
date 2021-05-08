@@ -385,7 +385,7 @@ int main(int argc, char **argv) {
 
     ros::Subscriber colshapesub = nh.subscribe("/RobotCollisionShapesAndStates", 1000, robotShapeCallback);
     ros::Subscriber statesub = nh.subscribe("FullCurrentState", 1, selfStateCallback);
-    ros::Subscriber occgridsub = nh.subscribe("OccupancyGrid", 1, occupancyGridCallback);
+    ros::Subscriber occgridsub = nh.subscribe("/OccupancyGrid", 1, occupancyGridCallback);
     ros::Publisher trajpub = nh.advertise<rlss_ros::PiecewiseTrajectory>("Trajectory", 1);
     ros::ServiceServer setdestraj = pnh.advertiseService("SetDesiredTrajectory", setDesiredTrajectoryCallback);
     ros::ServiceServer setonoff = pnh.advertiseService("SetOnOff", setOnOffCallback);

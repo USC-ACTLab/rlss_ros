@@ -20,21 +20,26 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "static_map_feeder");
     ros::NodeHandle nh;
 
+    ros::NodeHandle pnh("~");
+
     std::string obstacles_directory;
-    nh.getParam("obstacles_directory", obstacles_directory);
+    pnh.getParam("obstacles_directory", obstacles_directory);
 
     std::vector<double> step_size;
-    nh.getParam("occupancy_grid_step_size", step_size);
+    pnh.getParam("occupancy_grid_step_size", step_size);
     if(step_size.size() != DIM) {
         ROS_FATAL_STREAM("occupancy grid step size dimension" + std::to_string(step_size.size()) + " does not match dimension " + std::to_string(DIM));
         return 0;
     }
+
     OccCoordinate occ_step_size;
     for(std::size_t i = 0; i < DIM; i++) {
         occ_step_size(i) = step_size[i];
     }
 
+
     ROS_INFO_STREAM(occ_step_size.transpose());
+
     OccupancyGrid occupancy_grid(occ_step_size);
     boost::filesystem::path p(obstacles_directory);
     std::cout << std::endl;
@@ -70,7 +75,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    ros::Publisher pub = nh.advertise<rlss_ros::OccupancyGrid>("occupancy_grid", 1);
+    ros::Publisher pub = nh.advertise<rlss_ros::OccupancyGrid>("/OccupancyGrid", 1);
 
     ros::Rate rate(1);
     while(ros::ok()) {
