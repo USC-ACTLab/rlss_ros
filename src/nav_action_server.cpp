@@ -105,11 +105,11 @@ void execute(const rlss_ros::NAVGoalConstPtr& goal, NAVServer* as) {
         ros::spinOnce();
 
         if(as->isPreemptRequested()) {
-            ftcli->cancelGoal();
+            landcli->cancelGoal();
             preempted = true;
             break;
         } else {
-            bool result = ftcli->waitForResult(ros::Duration(0, 1));
+            bool result = landcli->waitForResult(ros::Duration(0, 1));
             if(result) {
                 preempted = false;
                 break;
