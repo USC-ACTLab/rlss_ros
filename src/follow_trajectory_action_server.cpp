@@ -73,17 +73,21 @@ void execute(const rlss_ros::FollowTrajectoryGoalConstPtr& goal, Server* as) {
 
     bool preempted = false;
     StdDequeVectorDIM position_queue;
-    double total_distance = 0;
+    int max_queue_size = 10;
 
     while(ros::ok()) {
         ros::spinOnce();
-        if(position_queue.size() == 10) {
-            total_distance -= (position_queue.front() - *std::next(position_queue.begin())).norm();
+
+        double total_distance = std::numeric_limits<double>::max();
+        if(position_queue.size() == max_queue_size) {
             position_queue.pop_front();
         }
         position_queue.push_back(state[0]);
-        if(position_queue.size() > 1) {
-            total_distance += (position_queue.back() - *std::prev(std::prev(position_queue.end()))).norm();
+        if(position_queue.size() == max_queue_size) {
+            total_distance = 0;
+            for(int i = 1; i < max_queue_size; i++) {
+                total_distance += (position_queue.at(i) - position_queue.at(i-1)).norm();
+            }
         }
 
 
@@ -91,12 +95,14 @@ void execute(const rlss_ros::FollowTrajectoryGoalConstPtr& goal, Server* as) {
             preempted = true;
             break;
         } else {
-            if((target_position - state[0]).norm() < 0.2) {
+            if((target_position - state[0]).norm() < 0.05) {
                 preempted = false;
                 break;
-            } else if(state[0](0) < 0.05) {
+            } else if(state[0](2) < 0.05) {
                 feedback.current_state = feedback.CRASHED;
-            } else if(total_distance < 0.05) {
+            } else if(position_queue.size() == 10 && total_distance < 0.008) {
+                preempted = false;
+                break;
                 feedback.current_state = feedback.DEADLOCKED;
             } else {
                 feedback.current_state = feedback.FOLLOWING;

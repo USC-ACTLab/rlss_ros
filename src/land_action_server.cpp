@@ -10,6 +10,8 @@
 #include <limits>
 #include <rlss_ros/Bezier.h>
 #include <rlss_ros/PiecewiseTrajectory.h>
+#include <crazyflie_driver/GoTo.h>
+#include <crazyflie_driver/Land.h>
 
 using Server = actionlib::SimpleActionServer<rlss_ros::LandAction>;
 using Client = actionlib::SimpleActionClient<rlss_ros::FollowTrajectoryAction>;
@@ -21,6 +23,8 @@ using StdVectorVectorDIM = rlss::internal::StdVectorVectorDIM<double, DIM>;
 using StdDequeVectorDIM = std::deque<VectorDIM, Eigen::aligned_allocator<std::pair<const int, VectorDIM>>>;
 
 ros::ServiceClient ControllerOnOffClient;
+ros::ServiceClient CrazyflieLandClient;
+ros::ServiceClient CrazyflieGoToClient;
 std::unique_ptr<Client> client;
 StdVectorVectorDIM state;
 unsigned int continuity_upto_degree;
@@ -31,7 +35,7 @@ void execute(const rlss_ros::LandGoalConstPtr& goal, Server* as) {
 
     rlss_ros::Bezier bez;
     bez.dimension = DIM;
-    bez.duration = std::abs(state[0](2) - goal->land_height) / (max_velocity / 5);
+    bez.duration = std::max(2.0, std::abs(state[0](2) - goal->land_height) / (max_velocity / 5));
     for(unsigned int d = 0; d < DIM; d++) {
         bez.cpts.push_back(state[0](d));
     }
@@ -82,6 +86,27 @@ void execute(const rlss_ros::LandGoalConstPtr& goal, Server* as) {
             rlss_ros::SetOnOff set_on_off;
             set_on_off.request.on = false;
             ControllerOnOffClient.call(set_on_off);
+        } else {
+            // crazyflie hack
+            crazyflie_driver::GoTo goto_srv;
+            goto_srv.request.groupMask = 0;
+            goto_srv.request.relative = false;
+            goto_srv.request.goal.z = *std::prev(bez.cpts.end());
+            goto_srv.request.goal.y = *std::prev(std::prev(bez.cpts.end()));
+            goto_srv.request.goal.x = *std::prev(std::prev(std::prev(bez.cpts.end())));
+            goto_srv.request.yaw = 0;
+            goto_srv.request.duration = ros::Duration(1.5);
+
+            CrazyflieGoToClient.call(goto_srv);
+            ros::Duration(2.0).sleep();
+
+            crazyflie_driver::Land land_srv;
+            land_srv.request.groupMask = 0;
+            land_srv.request.height = 0.06;
+            land_srv.request.duration = ros::Duration(2.0);
+
+            CrazyflieLandClient.call(land_srv);
+            ros::Duration(2.5).sleep();
         }
         as->setSucceeded(result);
     } else {
@@ -135,6 +160,25 @@ int main(int argc, char** argv) {
             ROS_ERROR_STREAM("ControllerOnOffClient not connected");
             return 0;
         }
+    }
+
+    if(ros::service::waitForService("go_to", 2)) {
+        CrazyflieGoToClient = nh.serviceClient<crazyflie_driver::GoTo>("go_to", true);
+        if(!CrazyflieGoToClient) {
+            ROS_ERROR_STREAM("CrazyflieGoToClient not connected");
+        }
+    } else {
+        ROS_WARN_STREAM("go_to service is not there");
+    }
+
+
+    if(ros::service::waitForService("land", 2)) {
+        CrazyflieLandClient = nh.serviceClient<crazyflie_driver::Land>("land", true);
+        if(!CrazyflieLandClient) {
+            ROS_ERROR_STREAM("CrazyflieLandClient not connected");
+        }
+    } else {
+        ROS_WARN_STREAM("land service is not there");
     }
 
     client = std::make_unique<Client>("FollowTrajectory", true);

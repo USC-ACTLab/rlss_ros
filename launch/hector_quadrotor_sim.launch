@@ -34,6 +34,7 @@
     <arg name="num_bezier_control_points" default="[7, 7, 7, 7]"/>
     <arg name="reference_frame" default="world"/>
     <arg name="robot_frame" default="$(arg ns)/base_link"/>
+    <arg name="homing_position" default="[0, 0]"/>
 
     <!-- CONTROLLER PARAMETERS -->
 <!--    <arg name="tf_prefix" default=""/>-->
@@ -75,6 +76,7 @@
     <rosparam param="commander_dt" subst_value="True">$(arg commander_dt)</rosparam>
     <rosparam param="reference_frame" subst_value="True">$(arg reference_frame)</rosparam>
     <rosparam param="robot_frame" subst_value="True">$(arg robot_frame)</rosparam>
+    <rosparam param="homing_position" subst_value="True">$(arg homing_position)</rosparam>
 
 
     <param name="with_controller" value="true"/>

@@ -9,8 +9,8 @@
     <arg name="continuity_upto_degree" default="2"/> <!-- used in commander as well -->
     <arg name="replanning_period" default="0.1"/>
     <arg name="maximum_derivative_magnitude_degrees" default="[1, 2]"/>
-    <arg name="maximum_derivative_magnitude_magnitudes" default="[3, 6]"/>
-    <arg name="workspace_min" default="[-50, -50, -1.5]"/>
+    <arg name="maximum_derivative_magnitude_magnitudes" default="[2, 4]"/>
+    <arg name="workspace_min" default="[-50, -50, -2]"/>
     <arg name="workspace_max" default="[50, 50, 50]"/>
     <arg name="collision_shape_at_zero_min" default="[-0.2, -0.2, -0.15]"/>
     <arg name="collision_shape_at_zero_max" default="[0.2, 0.2, 0.15]"/>
@@ -34,6 +34,7 @@
     <arg name="num_bezier_control_points" default="[7, 7, 7]"/>
     <arg name="reference_frame" default="world"/>
     <arg name="robot_frame" default="$(arg ns)"/>
+    <arg name="homing_position" default="[-2, 2]"/>
 
 
     <rosparam param="continuity_upto_degree" subst_value="True">$(arg continuity_upto_degree)</rosparam>
@@ -65,6 +66,7 @@
     <rosparam param="commander_dt" subst_value="True">$(arg commander_dt)</rosparam>
     <rosparam param="reference_frame" subst_value="True">$(arg reference_frame)</rosparam>
     <rosparam param="robot_frame" subst_value="True">$(arg robot_frame)</rosparam>
+    <rosparam param="homing_position" subst_value="True">$(arg homing_position)</rosparam>
 
 
     <param name="with_controller" value="false"/>
